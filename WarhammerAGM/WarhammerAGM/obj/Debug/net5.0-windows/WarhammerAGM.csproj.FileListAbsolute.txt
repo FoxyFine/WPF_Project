@@ -1,0 +1,6 @@
+C:\Users\nicac\source\repos\WarhammerAGM\WarhammerAGM\obj\Debug\net5.0-windows\WarhammerAGM.csproj.AssemblyReference.cache
+C:\Users\nicac\source\repos\WarhammerAGM\WarhammerAGM\obj\Debug\net5.0-windows\MainWindow.g.cs
+C:\Users\nicac\source\repos\WarhammerAGM\WarhammerAGM\obj\Debug\net5.0-windows\App.g.cs
+C:\Users\nicac\source\repos\WarhammerAGM\WarhammerAGM\obj\Debug\net5.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\nicac\source\repos\WarhammerAGM\WarhammerAGM\obj\Debug\net5.0-windows\WarhammerAGM_MarkupCompile.cache
+C:\Users\nicac\source\repos\WarhammerAGM\WarhammerAGM\obj\Debug\net5.0-windows\WarhammerAGM_MarkupCompile.lref
