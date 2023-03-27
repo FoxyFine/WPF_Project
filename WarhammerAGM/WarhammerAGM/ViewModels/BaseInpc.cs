@@ -35,6 +35,7 @@ namespace ViewModels
         {
             PropertyChanged?.Invoke(this, args);
         }
-        protected virtual void OnPropertyChanged(string propertyName, object? oldValue, object? newValue) { }
+        protected virtual void OnPropertyChanged(string propertyName, object? oldValue, object? newValue) {
+        }
     }
 }

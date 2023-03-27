@@ -16,10 +16,10 @@
 
     <Grid>
         <TabControl FontSize="36">
-            <TabItem Header="TabItem">
+            <TabItem Header="ТАБ ИТЭМ">
                 <Grid Background="#FFE5E5E5"/>
             </TabItem>
-            <TabItem Header="TabItem">
+            <TabItem Header="Инструменты">
                 <Grid Background="#FFE5E5E5">
                     <TabControl FontSize="22">
                         <TabItem Header="Бестиарий">
@@ -29,7 +29,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <ListView x:Name="ListViewBestiaryAddEditChange"  Grid.Column="0" ItemsSource="{Binding BestiaryCreatures}">
+                                <ListView x:Name="ListViewBestiaryAddEditChange"  Grid.Column="0" ItemsSource="{Binding BestiaryCreatures}" SelectedItem="{Binding SelectedItem}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel>
@@ -41,10 +41,11 @@
                                 <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
                                 <Grid Grid.Column="2">
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-                                    <ScrollViewer Grid.Row="0" Background="Gray">
+                                    <ScrollViewer Grid.Row="1" Background="Gray">
                                         <Grid x:Name="GridStatsEnter" Background="Gray" DataContext="{Binding BestiaryCreature}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
@@ -179,22 +180,24 @@
                                             </Grid>
                                         </Grid>
                                     </ScrollViewer>
-                                    <Grid Grid.Row="1">
+                                    <Grid Grid.Row="2">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" Content="Добавить" Margin="1" Command="{Binding AddCommand}" CommandParameter="{Binding Text, ElementName=NameStats}"/>
-                                            <Button Grid.Column="1" Content="Изменить" Margin="1" Command="{Binding EditCommand}" CommandParameter="{Binding ElementName=ListViewBestiaryAddEditChange, Path=SelectedItem}"  />
-                                            <Button Grid.Column="2" Content="Удалить" Margin="1" Command="{Binding DeleteCommand}" CommandParameter="{Binding ElementName=ListViewBestiaryAddEditChange, Path=SelectedItem}"  />
+                                            <Button Grid.Column="0" Content="Добавить" Margin="1" Command="{Binding AddCommand}" CommandParameter="{Binding ElementName=ListViewBestiaryAddEditChange, Path=SelectedItem}"/>
+                                            <Button Grid.Column="2" Content="Удалить" Margin="1" Command="{Binding DeleteCommand}" CommandParameter="{Binding ElementName=ListViewBestiaryAddEditChange, Path=SelectedItem}"/>
                                         </Grid>
+                                    </Grid>
+                                    <Grid Grid.Row="0">
+                                        <Button Grid.Column="1" HorizontalAlignment="Right" Content="Сохранить изменения" Margin="1" Command="{Binding EditCommand}" CommandParameter="{Binding ElementName=ListViewBestiaryAddEditChange, Path=SelectedItem}" Click="Button_Click"  />
                                     </Grid>
                                 </Grid>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="TabItem">
+                        <TabItem Header="Кубики">
                             <ScrollViewer>
                                 <Grid Background="Green"/>
                             </ScrollViewer>
