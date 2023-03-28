@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using ViewModels;
 using WarhammerAGM.Models;
 using Xceed.Wpf.Toolkit;
@@ -18,48 +19,27 @@ namespace WarhammerAGM
             get => Get<BestiaryCreature>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
         }
-       private BestiaryCreature _selectedItem;
 
         public BestiaryCreature? SelectedItem
         {
-            get => _selectedItem; 
-            set => Set(ref _selectedItem, value);
+            get => Get<BestiaryCreature?>();
+            set => Set(value);
         }
 
-        protected override void OnPropertyChanged(string propertyName, object oldValue, object newValue)
+        protected override void OnPropertyChanged(string propertyName, object? oldValue, object? newValue)
         {
             base.OnPropertyChanged(propertyName, oldValue, newValue);
 
             if (propertyName == nameof(SelectedItem))
             {
-                if (SelectedItem == null)
-                { return; }
-               //Присваивание BestiaryCreature данных выделенного элемента SelectedItem кроме Id
-                BestiaryCreature = new()
-                {
-                    Name = SelectedItem.Name,
-                    Description = SelectedItem.Description,
-                    Melee = SelectedItem.Melee,
-                    Ballistics = SelectedItem.Ballistics,
-                    Power = SelectedItem.Power,
-                    Endurance = SelectedItem.Endurance,
-                    Dexterity = SelectedItem.Dexterity,
-                    Intelligence = SelectedItem.Intelligence,
-                    Perception = SelectedItem.Perception,
-                    Willpower = SelectedItem.Willpower,
-                    Partnership = SelectedItem.Partnership,
-                    Wounds = SelectedItem.Wounds,
-                    Speed = SelectedItem.Speed,
-                    Skills = SelectedItem.Skills,
-                    Talents = SelectedItem.Talents,
-                    Armor = SelectedItem.Armor,
-                    Weapons = SelectedItem.Weapons,
-                    Equipment = SelectedItem.Equipment,
-                    AdditionalFeatures = SelectedItem.AdditionalFeatures,
-                    Features = SelectedItem.Features
-                };
+                BestiaryCreature? @new = (BestiaryCreature?)newValue;
+                if (@new is null)
+                    BestiaryCreature = new();
+                else
+                    BestiaryCreature = db.BestiaryCreatures.AsNoTracking().First(bc => bc.Id == @new.Id);
             }
         }
+
         public ApplicationViewModel()
         {
             /*В конструкторе класса загружаем данные из бд в локальный кэш*/
@@ -68,75 +48,57 @@ namespace WarhammerAGM
             BestiaryCreature = new();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
         }
+
         // команда добавления
         public RelayCommand AddCommand => GetCommand(() =>
         {
-            //Если был выделен уже элемент из списка ListView
-            BestiaryCreature? bestiaryCreature = SelectedItem as BestiaryCreature;
-            if (bestiaryCreature != null)
-            {
 
-                if (bestiaryCreature.Name == BestiaryCreature.Name)
-                {
-                    MessageBox.Show("Такое название уже существует");
-                    return;
-                }
-                else
-                {
-                    db.BestiaryCreatures.Add(BestiaryCreature);
-                    db.SaveChanges();
-                    BestiaryCreature = new();
-                    MessageBox.Show("Добавление прошло успешно");
-                    SelectedItem = null; //отменяем веделение элемента ListView
-                }
-            }
-            else //если не был выделен
+            string? name = BestiaryCreature.Name;
+            if (db.BestiaryCreatures.FirstOrDefault(bc => bc.Name == name) is not null)
             {
+                MessageBox.Show("Такое название уже существует");
+                return;
+            }
+            else
+            {
+                // Обнуляем Id и добавляем как новую
+                BestiaryCreature.Id = 0;
                 db.BestiaryCreatures.Add(BestiaryCreature);
                 db.SaveChanges();
-                BestiaryCreature = new();
-                MessageBox.Show("Добавление прошло успешно");
-            }
-            
-        });
-        // команда редактирования
-        public RelayCommand EditCommand => GetCommand<BestiaryCreature>(selectedItem =>
-        {
-            // получаем выделенный объект
-            BestiaryCreature? bestiaryCreature = selectedItem as BestiaryCreature;
-            if (bestiaryCreature == null) return;
-            bestiaryCreature.Name = BestiaryCreature.Name;
-            bestiaryCreature.Description = BestiaryCreature.Description;
-            bestiaryCreature.Melee = BestiaryCreature.Melee;
-            bestiaryCreature.Ballistics = BestiaryCreature.Ballistics;
-            bestiaryCreature.Power = BestiaryCreature.Power;
-            bestiaryCreature.Endurance = BestiaryCreature.Endurance;
-            bestiaryCreature.Dexterity = BestiaryCreature.Dexterity;
-            bestiaryCreature.Intelligence = BestiaryCreature.Intelligence;
-            bestiaryCreature.Perception = BestiaryCreature.Perception;
-            bestiaryCreature.Willpower = BestiaryCreature.Willpower;
-            bestiaryCreature.Partnership = BestiaryCreature.Partnership;
-            bestiaryCreature.Wounds = BestiaryCreature.Wounds;
-            bestiaryCreature.Speed = BestiaryCreature.Speed;
-            bestiaryCreature.Skills = BestiaryCreature.Skills;
-            bestiaryCreature.Talents = BestiaryCreature.Talents;
-            bestiaryCreature.Armor = BestiaryCreature.Armor;
-            bestiaryCreature.Weapons = BestiaryCreature.Weapons;
-            bestiaryCreature.Equipment = BestiaryCreature.Equipment;
-            bestiaryCreature.AdditionalFeatures = BestiaryCreature.AdditionalFeatures;
-            bestiaryCreature.Features = BestiaryCreature.Features;
 
-                db.Entry(bestiaryCreature).State = EntityState.Modified;
-                db.SaveChanges();
-            BestiaryCreature = new();
-            SelectedItem = null; //отменяем веделение элемента ListView
+                MessageBox.Show("Добавление прошло успешно");
+
+                //отменяем веделение элемента ListView
+                SelectedItem = null;
+            }
         });
-       
-        // команда удаления
-        public RelayCommand DeleteCommand => GetCommand<BestiaryCreature>(selectedItem =>
+
+        // команда редактирования
+        public RelayCommand EditCommand => GetCommand(() =>
         {
-            db.BestiaryCreatures.Remove(selectedItem);
+            // Запоминаем в локальной переменной
+            var bestCr = BestiaryCreature;
+
+            // Заменяем сущности
+            int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCr.Id).Count();
+            BestiaryCreatures.RemoveAt(index);
+            BestiaryCreatures.Insert(index, bestCr);
+
+            // Сохраняем изменения
             db.SaveChanges();
+
+            //отменяем веделение элемента ListView
+            SelectedItem = null;
+        });
+
+        // команда удаления
+        public RelayCommand DeleteCommand => GetCommand(() =>
+        {
+            if (SelectedItem is BestiaryCreature selectedItem)
+            {
+                db.BestiaryCreatures.Remove(selectedItem);
+                db.SaveChanges();
+            }
         });
     }
 }
