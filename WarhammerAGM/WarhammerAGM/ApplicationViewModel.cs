@@ -14,12 +14,14 @@ namespace WarhammerAGM
 
         public ObservableCollection<BestiaryCreature> BestiaryCreatures { get; }
 
+        /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature BestiaryCreature
         {
             get => Get<BestiaryCreature>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
         }
 
+        /// <summary>Выбранная сущность.</summary>
         public BestiaryCreature? SelectedItem
         {
             get => Get<BestiaryCreature?>();
@@ -49,7 +51,7 @@ namespace WarhammerAGM
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
         }
 
-        // команда добавления
+        /// <summary>Добавление сущности <see cref="BestiaryCreature"/>.</summary>
         public RelayCommand AddCommand => GetCommand(() =>
         {
 
@@ -73,7 +75,7 @@ namespace WarhammerAGM
             }
         });
 
-        // команда редактирования
+        /// <summary>Обновление сущности <see cref="BestiaryCreature"/>.</summary>
         public RelayCommand EditCommand => GetCommand(() =>
         {
             // Запоминаем в локальной переменной
@@ -91,14 +93,16 @@ namespace WarhammerAGM
             SelectedItem = null;
         });
 
-        // команда удаления
-        public RelayCommand DeleteCommand => GetCommand(() =>
-        {
-            if (SelectedItem is BestiaryCreature selectedItem)
+        /// <summary>Удаление сущности <see cref="SelectedItem"/>.</summary>
+        public RelayCommand DeleteCommand => GetCommand(
+            () =>
             {
-                db.BestiaryCreatures.Remove(selectedItem);
-                db.SaveChanges();
-            }
-        });
+                if (SelectedItem is BestiaryCreature selectedItem)
+                {
+                    db.BestiaryCreatures.Remove(selectedItem);
+                    db.SaveChanges();
+                }
+            },
+            () => SelectedItem is BestiaryCreature);
     }
 }

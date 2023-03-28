@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="540" Width="960"
         FontSize="16">
-    
+
     <Window.DataContext>
         <local:ApplicationViewModel/>
     </Window.DataContext>
@@ -33,7 +33,7 @@
                                           SelectedItem="{Binding SelectedItem}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                                <TextBlock Text="{Binding Name, Mode=OneTime}"  />
+                                            <TextBlock Text="{Binding Name, Mode=OneTime}"  />
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
@@ -190,9 +190,9 @@
                                             <Button Grid.Column="2" Content="Удалить" Margin="1" Command="{Binding DeleteCommand}"/>
                                         </Grid>
                                     </Grid>
-                                    <Grid Grid.Row="0">
-                                        <Button Grid.Column="1" HorizontalAlignment="Right" Content="Сохранить изменения" Margin="1" Command="{Binding EditCommand}" CommandParameter="{Binding ElementName=ListViewBestiaryAddEditChange, Path=SelectedItem}" Click="Button_Click"  />
-                                    </Grid>
+
+                                    <Button HorizontalAlignment="Right" Content="Сохранить изменения" Margin="1"
+                                            Command="{Binding EditCommand}"/>
                                 </Grid>
                             </Grid>
                         </TabItem>
