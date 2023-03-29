@@ -71,7 +71,10 @@ namespace WarhammerAGM
                 MessageBox.Show("Добавление прошло успешно");
 
                 //отменяем веделение элемента ListView
-                SelectedItem = null;
+                if (SelectedItem is null)
+                    BestiaryCreature = new();
+                else
+                    SelectedItem = null;
             }
         });
 

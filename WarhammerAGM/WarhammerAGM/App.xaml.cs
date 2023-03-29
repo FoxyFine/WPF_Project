@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
 
 namespace WarhammerAGM
@@ -13,5 +9,12 @@ namespace WarhammerAGM
     /// </summary>
     public partial class App : Application
     {
+        private void OnStartup(object sender, StartupEventArgs e)
+        {
+            if (MessageBox.Show("Удалить БД?", "Старт", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                File.Delete("Bestiary.db");
+            }
+        }
     }
 }
