@@ -79,7 +79,8 @@ namespace WarhammerAGM
         });
 
         /// <summary>Обновление сущности <see cref="BestiaryCreature"/>.</summary>
-        public RelayCommand EditCommand => GetCommand(() =>
+        public RelayCommand EditCommand => GetCommand(
+        () =>
         {
             // Запоминаем в локальной переменной
             var bestCr = BestiaryCreature;
@@ -94,7 +95,8 @@ namespace WarhammerAGM
 
             //отменяем веделение элемента ListView
             SelectedItem = null;
-        });
+        },
+        () => SelectedItem is BestiaryCreature);
 
         /// <summary>Удаление сущности <see cref="SelectedItem"/>.</summary>
         public RelayCommand DeleteCommand => GetCommand(
