@@ -54,7 +54,7 @@ namespace WarhammerAGM
         /// <summary>Добавление сущности <see cref="BestiaryCreature"/>.</summary>
         public RelayCommand AddCommand => GetCommand(() =>
         {
-
+            var bestCrId = BestiaryCreature.Id;
             // Обнуляем Id и добавляем как новую
             BestiaryCreature.Id = 0;
             db.BestiaryCreatures.Add(BestiaryCreature);
@@ -73,6 +73,7 @@ namespace WarhammerAGM
             {
                 // Здесь обработка ошибок ex
                 db.BestiaryCreatures.Remove(BestiaryCreature);
+                BestiaryCreature.Id = bestCrId;
                 MessageBox.Show("Такое название уже существует");
 
             }
