@@ -55,19 +55,12 @@ namespace WarhammerAGM
         public RelayCommand AddCommand => GetCommand(() =>
         {
 
-            string? name = BestiaryCreature.Name;
-            if (db.BestiaryCreatures.FirstOrDefault(bc => bc.Name == name) is not null)
+            // Обнуляем Id и добавляем как новую
+            BestiaryCreature.Id = 0;
+            db.BestiaryCreatures.Add(BestiaryCreature);
+            try
             {
-                MessageBox.Show("Такое название уже существует");
-                return;
-            }
-            else
-            {
-                // Обнуляем Id и добавляем как новую
-                BestiaryCreature.Id = 0;
-                db.BestiaryCreatures.Add(BestiaryCreature);
                 db.SaveChanges();
-
                 MessageBox.Show("Добавление прошло успешно");
 
                 //отменяем веделение элемента ListView
@@ -75,6 +68,13 @@ namespace WarhammerAGM
                     BestiaryCreature = new();
                 else
                     SelectedItem = null;
+            }
+            catch (Exception ex)
+            {
+                // Здесь обработка ошибок ex
+                db.BestiaryCreatures.Remove(BestiaryCreature);
+                MessageBox.Show("Такое название уже существует");
+
             }
         });
 
