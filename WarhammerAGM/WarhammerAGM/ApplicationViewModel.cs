@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -86,19 +87,30 @@ namespace WarhammerAGM
         public RelayCommand EditCommand => GetCommand(
         () =>
         {
-            // Запоминаем в локальной переменной
-            var bestCr = BestiaryCreature;
+            var bestCrOld = SelectedItem;
+            try
+            {
+                // Запоминаем в локальной переменной
+                var bestCr = BestiaryCreature;
 
-            // Заменяем сущности
-            int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCr.Id).Count();
-            BestiaryCreatures.RemoveAt(index);
-            BestiaryCreatures.Insert(index, bestCr);
+                // Заменяем сущности
+                int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCr.Id).Count();
+                BestiaryCreatures.RemoveAt(index);
+                BestiaryCreatures.Insert(index, bestCr);
 
-            // Сохраняем изменения
-            db.SaveChanges();
+                // Сохраняем изменения
+                db.SaveChanges();
 
-            //отменяем веделение элемента ListView
-            SelectedItem = null;
+                //отменяем вделение элемента ListView
+                SelectedItem = null;
+            }
+            catch (Exception ex)
+            {
+                int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCrOld.Id).Count();
+                BestiaryCreatures.RemoveAt(index);
+                BestiaryCreatures.Insert(index, bestCrOld);
+                MessageBox.Show("Такое название уже существует");
+            }
         },
         () => SelectedItem is BestiaryCreature);
 
