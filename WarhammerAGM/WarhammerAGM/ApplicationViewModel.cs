@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ViewModels;
 using WarhammerAGM.Models;
+using WarhammerAGM.Models.WarhammerAGM.Models;
 using Xceed.Wpf.Toolkit;
 
 namespace WarhammerAGM
@@ -63,7 +66,7 @@ namespace WarhammerAGM
                 db.SaveChanges();
                 MessageBox.Show("Добавление прошло успешно");
 
-                //отменяем веделение элемента ListView
+                //отменяем выделение элемента ListView
                 if (SelectedItem is null)
                     BestiaryCreature = new();
                 else
@@ -110,5 +113,57 @@ namespace WarhammerAGM
                 }
             },
             () => SelectedItem is BestiaryCreature);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        private RollCube _rollcube = new();
+        public RollCube RollCube
+        {
+            get => _rollcube;
+            private set
+            {
+                _rollcube = value;
+                OnPropertyChanged("RollCube");
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        }
+
+        public ObservableCollection<ListCube> ListCubeCollection { get; } = new();
+        public RelayCommand Roll => GetCommand(() =>
+        {
+            Random rnd = new();
+            int value = 0;
+            ListCube listCube = new();
+            int sum = 0;
+            int count = 0;
+            listCube.NameCube = "[" + DateTime.Now.ToString("HH:mm:ss") + "] " + RollCube.CubesNumber + "d" + RollCube.D_Cube;
+            if (RollCube.NumberAdditionSubtraction != 0) listCube.NameCube += RollCube.PlusMinus + RollCube.NumberAdditionSubtraction + ": ";
+            else listCube.NameCube += ": ";
+
+            for (int i = 0; i < RollCube.CubesNumber; i++) {
+                value = rnd.Next(1, RollCube.D_Cube);
+                sum += value;
+                if(RollCube.CubesNumber > 1)
+                    listCube.CubeResultToolTip += value;
+                count++;
+                if (count < RollCube.CubesNumber)
+                    listCube.CubeResultToolTip += "+";
+            }
+            if (RollCube.NumberAdditionSubtraction != 0)
+            {
+                listCube.CubeResultToolTip += RollCube.PlusMinus + RollCube.NumberAdditionSubtraction;
+                if(RollCube.PlusMinus == "+") sum += RollCube.NumberAdditionSubtraction;
+                else sum -= RollCube.NumberAdditionSubtraction;
+            }
+            listCube.CubeResult = sum.ToString();
+            ListCubeCollection.Add(listCube);
+        });
+        public RelayCommand ClearHistory => GetCommand(() =>
+        {
+            ListCubeCollection.Clear();
+        });
+
     }
 }
