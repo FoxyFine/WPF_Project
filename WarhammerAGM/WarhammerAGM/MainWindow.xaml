@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:WarhammerAGM"
         mc:Ignorable="d"
-        Title="MainWindow" Height="540" Width="960"
+        Title="MainWindow" Height="560" Width="990"
         FontSize="16">
 
     <Window.DataContext>
@@ -16,8 +16,37 @@
 
     <Grid>
         <TabControl FontSize="36" SelectedIndex="1">
-            <TabItem Header="ТАБ ИТЭМ">
-                <Grid Background="#FFE5E5E5"/>
+            <TabItem Header="Бестиарий">
+                <Grid Background="Gray">
+                    
+                </Grid>
+            </TabItem>
+            <TabItem Header="Инициатива">
+                <Grid Background="Gray">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TabControl FontSize="22">
+                        <TabItem Header="Инициатива">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                        <TabItem Header="Персонажи">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                    </TabControl>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Арсенал">
+                <Grid Background="Gray">
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Предметы">
+                <Grid Background="Gray">
+
+                </Grid>
             </TabItem>
             <TabItem Header="Инструменты">
                 <Grid Background="#FFE5E5E5">

@@ -157,7 +157,7 @@ namespace WarhammerAGM
             for (int i = 0; i < RollCube.CubesNumber; i++) {
                 value = rnd.Next(1, RollCube.D_Cube);
                 sum += value;
-                if(RollCube.CubesNumber > 1)
+                if(RollCube.CubesNumber > 1 || RollCube.NumberAdditionSubtraction != 0)
                     listCube.CubeResultToolTip += value;
                 count++;
                 if (count < RollCube.CubesNumber)
