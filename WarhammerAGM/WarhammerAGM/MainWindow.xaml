@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:WarhammerAGM"
         mc:Ignorable="d"
-        Title="MainWindow" Height="560" Width="990"
+        Title="MainWindow" Height="560" Width="1100"
         FontSize="16">
 
     <Window.DataContext>
@@ -40,11 +40,20 @@
             </TabItem>
             <TabItem Header="Арсенал">
                 <Grid Background="Gray">
-
-                </Grid>
-            </TabItem>
-            <TabItem Header="Предметы">
-                <Grid Background="Gray">
+                    <TabControl FontSize="22">
+                        <TabItem Header="Оружие">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                        <TabItem Header="Доспехи">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                        <TabItem Header="Оборудование">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                        <TabItem Header="Кибернетика">
+                            <Grid Background="#FFE5E5E5"/>
+                        </TabItem>
+                    </TabControl>
 
                 </Grid>
             </TabItem>

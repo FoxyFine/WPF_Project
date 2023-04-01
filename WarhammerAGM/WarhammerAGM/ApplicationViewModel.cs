@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -14,9 +13,10 @@ namespace WarhammerAGM
 {
     public class ApplicationViewModel : ViewModelBase
     {
-        private readonly ApplicationContext db = new ApplicationContext();
+        private readonly ApplicationContext db = new();
 
         public ObservableCollection<BestiaryCreature> BestiaryCreatures { get; }
+        public ObservableCollection<Weapon> Weapons { get; }
 
         /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature BestiaryCreature
@@ -126,6 +126,8 @@ namespace WarhammerAGM
             },
             () => SelectedItem is BestiaryCreature);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// Кубики
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private RollCube _rollcube = new();
         public RollCube RollCube
         {
@@ -175,7 +177,6 @@ namespace WarhammerAGM
         public RelayCommand ClearHistory => GetCommand(() =>
         {
             ListCubeCollection.Clear();
-        });
-
+        });   
     }
 }
