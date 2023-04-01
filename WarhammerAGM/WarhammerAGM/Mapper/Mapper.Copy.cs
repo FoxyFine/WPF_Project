@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace WarhammerAGM.Mapper
 {
-    public static partial class Copy
+    public static partial class Mapper
     {
         public static void CopyFrom<TTarget>(this TTarget target, in object source, params string[] propertyNames)
             => CopyFrom(target ?? throw new ArgumentNullException(nameof(target)),

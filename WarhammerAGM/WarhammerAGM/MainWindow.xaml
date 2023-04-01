@@ -226,11 +226,12 @@
                                             </Grid.ColumnDefinitions>
                                             <Button Grid.Column="0" Content="Добавить" Margin="1" Command="{Binding AddCommand}"/>
                                             <Button Grid.Column="2" Content="Удалить" Margin="1" Command="{Binding DeleteCommand}"/>
+                                            <Button Grid.Column="0" Content="Сохранить" Margin="1" Command="{Binding Save}" Visibility="Hidden" IsEnabled="False"/>
+                                            <Button Grid.Column="0" Content="Отменить" Margin="1" Command="{Binding Cancel}" Visibility="Hidden" IsEnabled="False"/>
                                         </Grid>
                                     </Grid>
 
-                                    <Button HorizontalAlignment="Right" Content="Сохранить изменения" Margin="1"
-                                            Command="{Binding EditCommand}"/>
+                                    <Button HorizontalAlignment="Right" Content="Сохранить изменения" Margin="1" Command="{Binding EditCommand}"/>
                                 </Grid>
                             </Grid>
                         </TabItem>

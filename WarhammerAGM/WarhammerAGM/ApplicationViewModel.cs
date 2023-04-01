@@ -55,8 +55,17 @@ namespace WarhammerAGM
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
         }
 
-        /// <summary>Добавление сущности <see cref="BestiaryCreature"/>.</summary>
         public RelayCommand AddCommand => GetCommand(() =>
+        {
+
+        });
+        public RelayCommand Cancel => GetCommand(() =>
+        {
+
+        });
+
+        /// <summary>Добавление сущности <see cref="BestiaryCreature"/>.</summary>
+        public RelayCommand Save => GetCommand(() =>
         {
             var bestCrId = BestiaryCreature.Id;
             // Обнуляем Id и добавляем как новую

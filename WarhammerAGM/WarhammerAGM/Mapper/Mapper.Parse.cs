@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace WarhammerAGM.Mapper
 {
-    public static partial class Parse
+    public static partial class Mapper
     {
         public static T Parse<T>(this string line, params string[] propertyNames)
             where T : new()
