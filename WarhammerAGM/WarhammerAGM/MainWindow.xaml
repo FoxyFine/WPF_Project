@@ -8,11 +8,12 @@
         xmlns:local="clr-namespace:WarhammerAGM"
         mc:Ignorable="d"
         Title="MainWindow" Height="540" Width="960"
-        FontSize="16">
+        FontSize="16"
+        DataContext="{DynamicResource vm}">
 
-    <Window.DataContext>
-        <local:ApplicationViewModel/>
-    </Window.DataContext>
+    <Window.Resources>
+        <local:ApplicationViewModel x:Key="vm"/>
+    </Window.Resources>
 
     <Grid>
         <TabControl FontSize="36" SelectedIndex="1">
@@ -30,7 +31,8 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <ListBox ItemsSource="{Binding BestiaryCreatures}"
-                                          SelectedItem="{Binding SelectedItem}">
+                                         SelectedItem="{Binding SelectedBC}"
+                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Name, Mode=OneTime}"  />
@@ -44,8 +46,27 @@
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
+                                    <Grid.Resources>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="IsReadOnly" Value="{Binding Mode, Converter={local:ViewMode}}"/>
+                                        </Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Margin" Value="5"/>
+                                            <Setter Property="Padding" Value="15 5"/>
+                                        </Style>
+                                    </Grid.Resources>
                                     <ScrollViewer Grid.Row="1" Background="Gray">
-                                        <Grid x:Name="GridStatsEnter" Background="Gray" DataContext="{Binding BestiaryCreature}">
+                                        <Grid x:Name="GridStatsEnter" Background="Gray">
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Setter Property="DataContext" Value="{Binding EditableBC}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}" Value="View">
+                                                            <Setter Property="DataContext" Value="{Binding SelectedBC}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto"/>
                                                 <RowDefinition Height="Auto"/>
@@ -133,19 +154,13 @@
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
                                                 <Expander Grid.Row="0" Margin="5" Header="Описание"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
-                                                    <Grid>
-                                                        <TextBox FontSize="14" Text="{Binding Description}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
-                                                    </Grid>
+                                                    <TextBox FontSize="14" Text="{Binding Description}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
                                                 </Expander>
                                                 <Expander Grid.Row="1" Margin="5" Header="Умения"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
-                                                    <Grid>
-                                                        <TextBox Text="{Binding Skills}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
-                                                    </Grid>
+                                                    <TextBox Text="{Binding Skills}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
                                                 </Expander>
                                                 <Expander Grid.Row="2" Margin="5" Header="Таланты"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
-                                                    <Grid>
-                                                        <TextBox Text="{Binding Talents}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
-                                                    </Grid>
+                                                    <TextBox Text="{Binding Talents}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
                                                 </Expander>
                                                 <Expander Grid.Row="3" Margin="5" Header="Броня и Оружие"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
                                                     <Grid>
@@ -167,32 +182,32 @@
                                                     </Grid>
                                                 </Expander>
                                                 <Expander Grid.Row="5" Margin="5" Header="Особенности"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
-                                                    <Grid>
-                                                        <TextBox Text="{Binding Features}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
-                                                    </Grid>
+                                                    <TextBox Text="{Binding Features}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
                                                 </Expander>
                                                 <Expander Grid.Row="6" Margin="5" Header="Дополнительнрые особенности"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
-                                                    <Grid>
-                                                        <TextBox Text="{Binding AdditionalFeatures}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
-                                                    </Grid>
+                                                    <TextBox Text="{Binding AdditionalFeatures}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
                                                 </Expander>
                                             </Grid>
                                         </Grid>
                                     </ScrollViewer>
-                                    <Grid Grid.Row="2">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" Content="Добавить" Margin="1" Command="{Binding AddCommand}"/>
-                                            <Button Grid.Column="2" Content="Удалить" Margin="1" Command="{Binding DeleteCommand}"/>
-                                        </Grid>
-                                    </Grid>
+                                    <UniformGrid Grid.Row="2"
+                                                 Rows="2"
+                                                 Columns="2"
+                                                 Visibility="{Binding Mode, Converter={local:ViewMode}}">
+                                        <Button Grid.Column="0" Content="Добавить" Command="{Binding Add}"/>
+                                        <Button Grid.Column="2" Content="Клонировать" Command="{Binding Clone}"/>
+                                        <Button Grid.Column="0" Content="Редактировать" Command="{Binding Update}"/>
+                                        <Button Grid.Column="2" Content="Удалить" Command="{Binding DeleteCommand}"/>
+                                    </UniformGrid>
 
-                                    <Button HorizontalAlignment="Right" Content="Сохранить изменения" Margin="1"
-                                            Command="{Binding EditCommand}"/>
+                                    <UniformGrid Rows="1" Columns="3"
+                                                 Visibility="{Binding Mode, Converter={local:ViewMode True}}">
+                                        <TextBlock Text="{Binding Mode, StringFormat={}Режим: {0}}" VerticalAlignment="Center"/>
+                                        <Button Content="Сохранить изменения"
+                                            Command="{Binding Save}"/>
+                                        <Button Content="Отменить"
+                                            Command="{Binding Exit}"/>
+                                    </UniformGrid>
                                 </Grid>
                             </Grid>
                         </TabItem>

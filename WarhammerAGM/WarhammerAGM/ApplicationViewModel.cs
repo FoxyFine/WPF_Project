@@ -12,21 +12,21 @@ using Xceed.Wpf.Toolkit;
 
 namespace WarhammerAGM
 {
-    public class ApplicationViewModel : ViewModelBase
+    public partial class ApplicationViewModel : ViewModelBase
     {
         private readonly ApplicationContext db = new ApplicationContext();
 
         public ObservableCollection<BestiaryCreature> BestiaryCreatures { get; }
 
         /// <summary>Сущность для региона детализации.</summary>
-        public BestiaryCreature BestiaryCreature
+        public BestiaryCreature EditableBC
         {
             get => Get<BestiaryCreature>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
         }
 
         /// <summary>Выбранная сущность.</summary>
-        public BestiaryCreature? SelectedItem
+        public BestiaryCreature? SelectedBC
         {
             get => Get<BestiaryCreature?>();
             set => Set(value);
@@ -36,13 +36,13 @@ namespace WarhammerAGM
         {
             base.OnPropertyChanged(propertyName, oldValue, newValue);
 
-            if (propertyName == nameof(SelectedItem))
+            if (propertyName == nameof(SelectedBC))
             {
                 BestiaryCreature? @new = (BestiaryCreature?)newValue;
                 if (@new is null)
-                    BestiaryCreature = new();
+                    EditableBC = new();
                 else
-                    BestiaryCreature = db.BestiaryCreatures.AsNoTracking().First(bc => bc.Id == @new.Id);
+                    EditableBC = db.BestiaryCreatures.AsNoTracking().First(bc => bc.Id == @new.Id);
             }
         }
 
@@ -51,47 +51,47 @@ namespace WarhammerAGM
             /*В конструкторе класса загружаем данные из бд в локальный кэш*/
             db.Database.EnsureCreated();
             db.BestiaryCreatures.Load();
-            BestiaryCreature = new();
+            EditableBC = new();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
         }
 
-        /// <summary>Добавление сущности <see cref="BestiaryCreature"/>.</summary>
+        /// <summary>Добавление сущности <see cref="EditableBC"/>.</summary>
         public RelayCommand AddCommand => GetCommand(() =>
         {
-            var bestCrId = BestiaryCreature.Id;
+            var bestCrId = EditableBC.Id;
             // Обнуляем Id и добавляем как новую
-            BestiaryCreature.Id = 0;
-            db.BestiaryCreatures.Add(BestiaryCreature);
+            EditableBC.Id = 0;
+            db.BestiaryCreatures.Add(EditableBC);
             try
             {
                 db.SaveChanges();
                 MessageBox.Show("Добавление прошло успешно");
 
                 //отменяем выделение элемента ListView
-                if (SelectedItem is null)
-                    BestiaryCreature = new();
+                if (SelectedBC is null)
+                    EditableBC = new();
                 else
-                    SelectedItem = null;
+                    SelectedBC = null;
             }
             catch (Exception ex)
             {
                 // Здесь обработка ошибок ex
-                db.BestiaryCreatures.Remove(BestiaryCreature);
-                BestiaryCreature.Id = bestCrId;
+                db.BestiaryCreatures.Remove(EditableBC);
+                EditableBC.Id = bestCrId;
                 MessageBox.Show("Такое название уже существует");
 
             }
         });
 
-        /// <summary>Обновление сущности <see cref="BestiaryCreature"/>.</summary>
+        /// <summary>Обновление сущности <see cref="EditableBC"/>.</summary>
         public RelayCommand EditCommand => GetCommand(
         () =>
         {
-            var bestCrOld = SelectedItem;
+            var bestCrOld = SelectedBC;
             try
             {
                 // Запоминаем в локальной переменной
-                var bestCr = BestiaryCreature;
+                var bestCr = EditableBC;
 
                 // Заменяем сущности
                 int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCr.Id).Count();
@@ -102,7 +102,7 @@ namespace WarhammerAGM
                 db.SaveChanges();
 
                 //отменяем вделение элемента ListView
-                SelectedItem = null;
+                SelectedBC = null;
             }
             catch (Exception ex)
             {
@@ -112,19 +112,19 @@ namespace WarhammerAGM
                 MessageBox.Show("Такое название уже существует");
             }
         },
-        () => SelectedItem is BestiaryCreature);
+        () => SelectedBC is BestiaryCreature);
 
-        /// <summary>Удаление сущности <see cref="SelectedItem"/>.</summary>
+        /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
         public RelayCommand DeleteCommand => GetCommand(
             () =>
             {
-                if (SelectedItem is BestiaryCreature selectedItem)
+                if (SelectedBC is BestiaryCreature selectedItem)
                 {
                     db.BestiaryCreatures.Remove(selectedItem);
                     db.SaveChanges();
                 }
             },
-            () => SelectedItem is BestiaryCreature);
+            () => SelectedBC is BestiaryCreature);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         private RollCube _rollcube = new();
         public RollCube RollCube
@@ -176,6 +176,5 @@ namespace WarhammerAGM
         {
             ListCubeCollection.Clear();
         });
-
     }
 }
