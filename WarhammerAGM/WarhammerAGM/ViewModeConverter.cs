@@ -13,9 +13,9 @@ namespace WarhammerAGM
         {
             var mode = (ViewMode)value;
             var view = mode == ViewMode.View;
-            view ^= not;
+            view ^= not; //view будет true если только одна из переменных true, остальное даст false
             if (targetType == typeof(Visibility))
-                return view ? Visibility.Visible : Visibility.Collapsed;
+                return view ? Visibility.Visible : Visibility.Collapsed; //Collapsed - элемент не виден и не участвует в компоновке.
             return view;
         }
 

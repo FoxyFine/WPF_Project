@@ -1,4 +1,6 @@
 ﻿using Mapping;
+using System;
+using System.Linq;
 using System.Windows;
 using ViewModels;
 using WarhammerAGM.Models;
@@ -7,6 +9,7 @@ namespace WarhammerAGM
 {
     public partial class ApplicationViewModel
     {
+        BestiaryCreature bestCrOld; //создание локальной переменной используемой в редактировании
         public ViewMode Mode { get => Get<ViewMode>(); private set => Set(value); }
 
         public RelayCommand Update => GetCommand
@@ -14,6 +17,7 @@ namespace WarhammerAGM
             () =>
             {
                 EditableBC = SelectedBC!.Create<BestiaryCreature>();
+                bestCrOld = SelectedBC;
                 Mode = ViewMode.Update;
             },
             () => SelectedBC is not null
@@ -41,16 +45,56 @@ namespace WarhammerAGM
 
         public RelayCommand Exit => GetCommand
         (
-            () => Mode = ViewMode.View,
-            () => SelectedBC is not null
+            () =>
+            {
+                Mode = ViewMode.View;
+                SelectedBC = null;
+            } 
+
         );
 
         public RelayCommand Save => GetCommand
         (
-            () => MessageBox.Show("Сохранение измений"),
-            () => SelectedBC is not null
+            () => 
+            {
+                if (Mode == ViewMode.Add)
+                {
+                    try
+                    {
+                        db.BestiaryCreatures.Add(EditableBC);
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        db.BestiaryCreatures.Remove(EditableBC);
+                        MessageBox.Show("Такое название уже существует");
+                        return;
+                    }
+                }
+                else
+                if(Mode == ViewMode.Update) {
+                    var bestCr = EditableBC;
+                    int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCr.Id).Count();
+                    try
+                    {
+                        BestiaryCreatures.RemoveAt(index);
+                        BestiaryCreatures.Insert(index, bestCr);
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        BestiaryCreatures.RemoveAt(index);
+                        BestiaryCreatures.Insert(index, bestCrOld);
+                        EditableBC = bestCrOld;
+                        MessageBox.Show("Такое название уже существует");
+                        return;
+                    }
+                }
+                MessageBox.Show("Сохранение прошло успешно");
+                Mode = ViewMode.View;
+            }
         );
     }
 
     public enum ViewMode { View, Update, Add }
-}
+} 

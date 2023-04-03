@@ -38,14 +38,13 @@ namespace WarhammerAGM
 
             if (propertyName == nameof(SelectedBC))
             {
-                BestiaryCreature? @new = (BestiaryCreature?)newValue;
+                BestiaryCreature? @new = (BestiaryCreature?)newValue; //@new. Символ @ предшествует элементу кода, который компилятор должен интерпретировать как идентификатор, а не ключевое слово C#
                 if (@new is null)
                     EditableBC = new();
                 else
-                    EditableBC = db.BestiaryCreatures.AsNoTracking().First(bc => bc.Id == @new.Id);
+                    EditableBC = db.BestiaryCreatures.AsNoTracking().First(bc => bc.Id == @new.Id); //Чтобы данные не помещались в кэш, применяется метод AsNoTracking()
             }
         }
-
         public ApplicationViewModel()
         {
             /*В конструкторе класса загружаем данные из бд в локальный кэш*/
@@ -54,66 +53,6 @@ namespace WarhammerAGM
             EditableBC = new();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
         }
-
-        /// <summary>Добавление сущности <see cref="EditableBC"/>.</summary>
-        public RelayCommand AddCommand => GetCommand(() =>
-        {
-            var bestCrId = EditableBC.Id;
-            // Обнуляем Id и добавляем как новую
-            EditableBC.Id = 0;
-            db.BestiaryCreatures.Add(EditableBC);
-            try
-            {
-                db.SaveChanges();
-                MessageBox.Show("Добавление прошло успешно");
-
-                //отменяем выделение элемента ListView
-                if (SelectedBC is null)
-                    EditableBC = new();
-                else
-                    SelectedBC = null;
-            }
-            catch (Exception ex)
-            {
-                // Здесь обработка ошибок ex
-                db.BestiaryCreatures.Remove(EditableBC);
-                EditableBC.Id = bestCrId;
-                MessageBox.Show("Такое название уже существует");
-
-            }
-        });
-
-        /// <summary>Обновление сущности <see cref="EditableBC"/>.</summary>
-        public RelayCommand EditCommand => GetCommand(
-        () =>
-        {
-            var bestCrOld = SelectedBC;
-            try
-            {
-                // Запоминаем в локальной переменной
-                var bestCr = EditableBC;
-
-                // Заменяем сущности
-                int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCr.Id).Count();
-                BestiaryCreatures.RemoveAt(index);
-                BestiaryCreatures.Insert(index, bestCr);
-
-                // Сохраняем изменения
-                db.SaveChanges();
-
-                //отменяем вделение элемента ListView
-                SelectedBC = null;
-            }
-            catch (Exception ex)
-            {
-                int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCrOld.Id).Count();
-                BestiaryCreatures.RemoveAt(index);
-                BestiaryCreatures.Insert(index, bestCrOld);
-                MessageBox.Show("Такое название уже существует");
-            }
-        },
-        () => SelectedBC is BestiaryCreature);
-
         /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
         public RelayCommand DeleteCommand => GetCommand(
             () =>
