@@ -1,4 +1,6 @@
 ﻿using Mapping;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Linq;
 using System.Windows;
@@ -9,7 +11,6 @@ namespace WarhammerAGM
 {
     public partial class ApplicationViewModel
     {
-        BestiaryCreature bestCrOld; //создание локальной переменной используемой в редактировании
         public ViewMode Mode { get => Get<ViewMode>(); private set => Set(value); }
 
         public RelayCommand Update => GetCommand
@@ -17,7 +18,6 @@ namespace WarhammerAGM
             () =>
             {
                 EditableBC = SelectedBC!.Create<BestiaryCreature>();
-                bestCrOld = SelectedBC;
                 Mode = ViewMode.Update;
             },
             () => SelectedBC is not null
@@ -49,45 +49,55 @@ namespace WarhammerAGM
             {
                 Mode = ViewMode.View;
                 SelectedBC = null;
-            } 
-
+            }
         );
 
         public RelayCommand Save => GetCommand
         (
-            () => 
+            () =>
             {
                 if (Mode == ViewMode.Add)
                 {
-                    try
+                    if (db.BestiaryCreatures.Find(EditableBC.Id) is null)
                     {
-                        db.BestiaryCreatures.Add(EditableBC);
-                        db.SaveChanges();
+                        MessageBox.Show("Такое Id уже существует");
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        db.BestiaryCreatures.Remove(EditableBC);
-                        MessageBox.Show("Такое название уже существует");
-                        return;
+                        EntityEntry<BestiaryCreature> entry = db.BestiaryCreatures.Add(EditableBC);
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+                            entry.State = EntityState.Detached;
+                            MessageBox.Show("Такое название уже существует");
+                            return;
+                        }
                     }
                 }
-                else
-                if(Mode == ViewMode.Update) {
-                    var bestCr = EditableBC;
-                    int index = BestiaryCreatures.TakeWhile(bc => bc.Id != bestCr.Id).Count();
-                    try
+                else if (Mode == ViewMode.Update)
+                {
+                    int index = BestiaryCreatures.TakeWhile(bc => bc.Id != EditableBC.Id).Count();
+                    if (index < 0)
                     {
-                        BestiaryCreatures.RemoveAt(index);
-                        BestiaryCreatures.Insert(index, bestCr);
-                        db.SaveChanges();
+                        MessageBox.Show("Такого Id не существует");
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        BestiaryCreatures.RemoveAt(index);
-                        BestiaryCreatures.Insert(index, bestCrOld);
-                        EditableBC = bestCrOld;
-                        MessageBox.Show("Такое название уже существует");
-                        return;
+                        BestiaryCreature bestCrOld = BestiaryCreatures[index];
+                        try
+                        {
+                            BestiaryCreatures[index] = EditableBC;
+                            db.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+                            BestiaryCreatures[index] = bestCrOld;
+                            MessageBox.Show("Такое название уже существует");
+                            return;
+                        }
                     }
                 }
                 MessageBox.Show("Сохранение прошло успешно");
@@ -97,4 +107,4 @@ namespace WarhammerAGM
     }
 
     public enum ViewMode { View, Update, Add }
-} 
+}
