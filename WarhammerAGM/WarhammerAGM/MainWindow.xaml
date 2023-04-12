@@ -56,7 +56,18 @@
                                         </Style>
                                     </Grid.Resources>
                                     <ScrollViewer Grid.Row="1" Background="Gray">
-                                        <Grid x:Name="GridStatsEnter" Background="Gray"
+                                        <ScrollViewer.Resources>
+                                                <Style TargetType="TextBox">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}"
+                                                                 Value="View">
+                                                            <Setter Property="IsReadOnly" Value="True"/>
+                                                            <Setter Property="IsReadOnlyCaretVisible" Value="True"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                        </ScrollViewer.Resources>
+                                        <Grid x:Name="GridStatsEnter" Background="Gray"   
                                               d:DataContext="{d:DesignInstance Type=models:BestiaryCreature}">
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
@@ -81,7 +92,7 @@
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Text="Название:" Margin="5"/>
-                                                <TextBox x:Name="NameStats" Text="{Binding Name}" Grid.Column="1" Margin="5"/>
+                                                <TextBox x:Name="NameStats" Text="{Binding Name}" Grid.Column="1" Margin="5" MaxLength="100"/>
                                             </Grid>
 
                                             <Grid Grid.Row="1" Margin="3">
@@ -204,7 +215,7 @@
                                     <UniformGrid Rows="1" Columns="3"
                                                  Visibility="{Binding Mode, Converter={local:ViewMode True}}">
                                         <TextBlock Text="{Binding Mode, StringFormat={}Режим: {0}}" VerticalAlignment="Center"/>
-                                        <Button Content="Сохранить изменения"
+                                        <Button Content="Сохранить"
                                             Command="{Binding Save}"/>
                                         <Button Content="Отменить"
                                             Command="{Binding Exit}"/>

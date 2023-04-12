@@ -29,6 +29,8 @@ namespace WarhammerAGM
             {
                 EditableBC = new BestiaryCreature();
                 Mode = ViewMode.Add;
+                TextBoxReadOnlyOrNot = true;
+                
             }
         );
 
@@ -58,9 +60,10 @@ namespace WarhammerAGM
             {
                 if (Mode == ViewMode.Add)
                 {
-                    if (db.BestiaryCreatures.Find(EditableBC.Id) is null)
+                    if (db.BestiaryCreatures.Find(EditableBC.Id) is not null)
                     {
                         MessageBox.Show("Такое Id уже существует");
+                        return;
                     }
                     else
                     {
@@ -83,6 +86,7 @@ namespace WarhammerAGM
                     if (index < 0)
                     {
                         MessageBox.Show("Такого Id не существует");
+                        return;
                     }
                     else
                     {

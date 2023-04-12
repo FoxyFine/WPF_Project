@@ -31,7 +31,10 @@ namespace WarhammerAGM
             get => Get<BestiaryCreature?>();
             set => Set(value);
         }
-
+        public bool? TextBoxReadOnlyOrNot
+        { 
+          set => Set(value); 
+        }
         protected override void OnPropertyChanged(string propertyName, object? oldValue, object? newValue)
         {
             base.OnPropertyChanged(propertyName, oldValue, newValue);
