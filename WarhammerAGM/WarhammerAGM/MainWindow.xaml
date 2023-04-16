@@ -32,8 +32,10 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <DockPanel Grid.Column="0">
-                                    <TextBox x:Name="SearchTextField" DockPanel.Dock="Top" Margin="10" Text="{Binding SearchText,
-                                        UpdateSourceTrigger=PropertyChanged}"/>
+    <TextBox x:Name="SearchTextField" DockPanel.Dock="Top" Margin="10"
+                Text="{Binding SearchText,
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
+                            UpdateSourceTrigger=PropertyChanged}"/>
                                     <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
                                          SelectedItem="{Binding SelectedBC}"
                                          IsEnabled="{Binding Mode, Converter={local:ViewMode}}">

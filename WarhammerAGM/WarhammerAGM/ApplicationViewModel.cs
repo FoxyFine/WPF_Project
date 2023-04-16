@@ -1,16 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows.Controls;
 using System.Windows.Data;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
-using Xceed.Wpf.Toolkit;
 
 namespace WarhammerAGM
 {
@@ -23,7 +18,6 @@ namespace WarhammerAGM
             db.BestiaryCreatures.Load();
             EditableBC = new();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
-            source = (CollectionViewSource)Resources["bestiaryCreatureView"];
         }
 
         private readonly ApplicationContext db = new ApplicationContext();
@@ -32,32 +26,6 @@ namespace WarhammerAGM
         //поиск данных по имени 
         private readonly CollectionViewSource source = null!;
 
-        private string? inputText;
-        public string? SearchText
-        {
-            get => inputText;
-            set { inputText = value; SearchChanged(); }
-        }
-        private FilterEventHandler? filter;
-        private void SearchChanged()
-        {
-            string searchText = inputText?.Trim() ?? string.Empty;
-            source.Filter -= filter;
-
-            filter = (string.IsNullOrEmpty(searchText)) switch
-            {
-                (false) => (object sender, FilterEventArgs e) =>
-                {
-                    BestiaryCreature bestiaryCreature = (BestiaryCreature)e.Item;
-                    e.Accepted = bestiaryCreature.Name.Contains(searchText);
-                }
-                ,
-                (true) => (object sender, FilterEventArgs e) => 
-                e.Accepted = ((BestiaryCreature)e.Item).Name == null
-            };;
-
-            source.Filter += filter;
-        }
         /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature EditableBC
         {
@@ -96,22 +64,11 @@ namespace WarhammerAGM
             },
             () => SelectedBC is BestiaryCreature);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        private RollCube _rollcube = new();
         public RollCube RollCube
         {
-            get => _rollcube;
-            private set
-            {
-                _rollcube = value;
-                OnPropertyChanged("RollCube");
-            }
+            get => Get<RollCube>()!;
+            private set => Set(value);
         }
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string prop = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
-
         public ObservableCollection<ListCube> ListCubeCollection { get; } = new();
         public RelayCommand Roll => GetCommand(() =>
         {
