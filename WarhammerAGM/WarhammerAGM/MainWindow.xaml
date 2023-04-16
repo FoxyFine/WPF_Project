@@ -13,6 +13,7 @@
 
     <Window.Resources>
         <local:ApplicationViewModel x:Key="vm"/>
+        <CollectionViewSource x:Key="bestiaryCreatureView" Source="{Binding BestiaryCreatures}"/>
     </Window.Resources>
 
     <Grid>
@@ -30,15 +31,19 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <ListBox ItemsSource="{Binding BestiaryCreatures}"
+                                <DockPanel Grid.Column="0">
+                                    <TextBox x:Name="SearchTextField" DockPanel.Dock="Top" Margin="10" Text="{Binding SearchText,
+                                        UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
                                          SelectedItem="{Binding SelectedBC}"
                                          IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Name, Mode=OneTime}"  />
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name, Mode=OneTime}"  />
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </DockPanel>
                                 <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
                                 <Grid Grid.Column="2">
                                     <Grid.RowDefinitions>

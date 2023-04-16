@@ -5,6 +5,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Controls;
+using System.Windows.Data;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
@@ -14,10 +16,48 @@ namespace WarhammerAGM
 {
     public partial class ApplicationViewModel : ViewModelBase
     {
-        private readonly ApplicationContext db = new ApplicationContext();
+        public ApplicationViewModel()
+        {
+            /*В конструкторе класса загружаем данные из бд в локальный кэш*/
+            db.Database.EnsureCreated();
+            db.BestiaryCreatures.Load();
+            EditableBC = new();
+            BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
+            source = (CollectionViewSource)Resources["bestiaryCreatureView"];
+        }
 
+        private readonly ApplicationContext db = new ApplicationContext();
         public ObservableCollection<BestiaryCreature> BestiaryCreatures { get; }
 
+        //поиск данных по имени 
+        private readonly CollectionViewSource source = null!;
+
+        private string? inputText;
+        public string? SearchText
+        {
+            get => inputText;
+            set { inputText = value; SearchChanged(); }
+        }
+        private FilterEventHandler? filter;
+        private void SearchChanged()
+        {
+            string searchText = inputText?.Trim() ?? string.Empty;
+            source.Filter -= filter;
+
+            filter = (string.IsNullOrEmpty(searchText)) switch
+            {
+                (false) => (object sender, FilterEventArgs e) =>
+                {
+                    BestiaryCreature bestiaryCreature = (BestiaryCreature)e.Item;
+                    e.Accepted = bestiaryCreature.Name.Contains(searchText);
+                }
+                ,
+                (true) => (object sender, FilterEventArgs e) => 
+                e.Accepted = ((BestiaryCreature)e.Item).Name == null
+            };;
+
+            source.Filter += filter;
+        }
         /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature EditableBC
         {
@@ -31,10 +71,6 @@ namespace WarhammerAGM
             get => Get<BestiaryCreature?>();
             set => Set(value);
         }
-        public bool? TextBoxReadOnlyOrNot
-        { 
-          set => Set(value); 
-        }
         protected override void OnPropertyChanged(string propertyName, object? oldValue, object? newValue)
         {
             base.OnPropertyChanged(propertyName, oldValue, newValue);
@@ -47,14 +83,6 @@ namespace WarhammerAGM
                 else
                     EditableBC = db.BestiaryCreatures.AsNoTracking().First(bc => bc.Id == @new.Id); //Чтобы данные не помещались в кэш, применяется метод AsNoTracking()
             }
-        }
-        public ApplicationViewModel()
-        {
-            /*В конструкторе класса загружаем данные из бд в локальный кэш*/
-            db.Database.EnsureCreated();
-            db.BestiaryCreatures.Load();
-            EditableBC = new();
-            BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
         }
         /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
         public RelayCommand DeleteCommand => GetCommand(

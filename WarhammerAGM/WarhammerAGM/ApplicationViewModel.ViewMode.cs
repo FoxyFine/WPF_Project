@@ -29,7 +29,6 @@ namespace WarhammerAGM
             {
                 EditableBC = new BestiaryCreature();
                 Mode = ViewMode.Add;
-                TextBoxReadOnlyOrNot = true;
                 
             }
         );
