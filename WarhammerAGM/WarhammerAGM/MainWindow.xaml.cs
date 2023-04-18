@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Data;
 using WarhammerAGM.Models;
 
@@ -33,8 +34,10 @@ namespace WarhammerAGM
             {
                 (false) => (object sender, FilterEventArgs e) =>
                 {
-                    BestiaryCreature bestiaryCreature = (BestiaryCreature)e.Item;
-                    e.Accepted = bestiaryCreature.Name.Contains(searchText);
+                    BestiaryCreature bestiaryCreature = (BestiaryCreature)e.Item; // Item Получает объект, который должен проверить фильтр
+                    e.Accepted = bestiaryCreature.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase); // Accepted Получает или задает значение, которое показывает, проходит ли данный элемент фильтр
+                    //true, если элемент проходит фильтр; в противном случае, false. Значение по умолчанию — true.
+                    //InvariantCulture/InvariantCultureIgnoreCase — сравнение по словам без учёта правил языка и культуры и языка
                 }
                 ,
                 (true) => null
