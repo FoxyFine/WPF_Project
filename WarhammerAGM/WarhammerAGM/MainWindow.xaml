@@ -63,14 +63,37 @@
                                             <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Добавить игроков в инициативу"/>
                                             <Button MinHeight="50" MinWidth="50" Margin="12,0,3,0" ToolTip="Очистить поле и окончить бой"/>
                                         </StackPanel>
-                                        <ListBox>
-                                            
+                                        <ListBox Grid.Row="1">
+                                            <StackPanel Orientation="Horizontal" MinWidth="440">
+                                                <StackPanel Orientation="Vertical" MinWidth="100">
+                                                    <TextBlock Text="Name" FontSize="22"/>
+                                                    <Slider Value="0" Minimum="0" Maximum="100" SelectionStart="0" Height="30"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Vertical">
+                                                    <TextBlock Text="Состояния" FontSize="22"/>
+                                                </StackPanel>
+                                            </StackPanel>
                                         </ListBox>
                                     </Grid>
                                 </ScrollViewer>
                             </TabItem>
                             <TabItem Header="Персонажи">
-                                <Grid Background="#FFE5E5E5"/>
+                                <Grid Background="#FFE5E5E5">
+                                    <ListBox>
+                                        <StackPanel Orientation="Vertical">
+                                            <StackPanel>
+                                                <TextBlock Text="Name" FontSize="22" MinWidth="100"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Slider Value="0" Minimum="0" Maximum="100" SelectionStart="0" Height="30" MinWidth="150"/>
+                                                    <TextBox Text="HP" FontSize="22"/>
+                                                </StackPanel>
+                                                <Expander Header="Характеристики">
+                                                    
+                                                </Expander>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </ListBox>
+                                </Grid>
                             </TabItem>
                         </TabControl>
 
@@ -194,6 +217,212 @@
                                                 <TextBox x:Name="WillPowStats" Grid.Column="7" Grid.Row="2" Text="{Binding Willpower}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="8" Grid.Row="1" Text="Тов"/>
                                                 <TextBox x:Name="PartStats" Grid.Column="8" Grid.Row="2" Text="{Binding Partnership}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                            </Grid>
+
+
+                                            <Grid Grid.Row="2">
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="50"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Раны:" Margin="5"/>
+                                                <TextBox Text="{Binding Wounds}" Grid.Row="0" Grid.Column="1" Margin="5"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Скорость:" Margin="5"/>
+                                                <xctk:MaskedTextBox Grid.Row="0" Grid.Column="3" Text="{Binding Speed}" Mask="00/00/00/00"/>
+
+                                            </Grid>
+
+
+                                            <Grid Grid.Row="3">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <Expander Grid.Row="0" Margin="5" Header="Описание"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                    <TextBox FontSize="14" Text="{Binding Description}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
+                                                </Expander>
+                                                <Expander Grid.Row="1" Margin="5" Header="Умения"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                    <TextBox Text="{Binding Skills}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
+                                                </Expander>
+                                                <Expander Grid.Row="2" Margin="5" Header="Таланты"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                    <TextBox Text="{Binding Talents}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
+                                                </Expander>
+                                                <Expander Grid.Row="3" Margin="5" Header="Броня и Оружие"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="Auto"/>
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Grid.Row="0" Text="Броня" FontSize="14"/>
+                                                        <TextBox Grid.Row="1" Text="{Binding Armor}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="50"/>
+                                                        <TextBlock Grid.Row="2" Text="Оружие" FontSize="14"/>
+                                                        <TextBox Grid.Row="3" Text="{Binding Weapons}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="50"/>
+                                                    </Grid>
+                                                </Expander>
+                                                <Expander Grid.Row="4" Margin="5" Header="Оборудование"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                    <Grid>
+                                                        <TextBox Text="{Binding Equipment}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
+                                                    </Grid>
+                                                </Expander>
+                                                <Expander Grid.Row="5" Margin="5" Header="Особенности"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                    <TextBox Text="{Binding Features}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
+                                                </Expander>
+                                                <Expander Grid.Row="6" Margin="5" Header="Дополнительнрые особенности"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                    <TextBox Text="{Binding AdditionalFeatures}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
+                                                </Expander>
+                                            </Grid>
+                                        </Grid>
+                                    </ScrollViewer>
+                                    <UniformGrid Grid.Row="2"
+                                                 Rows="2"
+                                                 Columns="2"
+                                                 Visibility="{Binding Mode, Converter={local:ViewMode}}">
+                                        <Button Grid.Column="0" Content="Добавить" Command="{Binding Add}"/>
+                                        <Button Grid.Column="2" Content="Клонировать" Command="{Binding Clone}"/>
+                                        <Button Grid.Column="0" Content="Редактировать" Command="{Binding Update}"/>
+                                        <Button Grid.Column="2" Content="Удалить" Command="{Binding DeleteCommand}"/>
+                                    </UniformGrid>
+
+                                    <UniformGrid Rows="1" Columns="3"
+                                                 Visibility="{Binding Mode, Converter={local:ViewMode True}}">
+                                        <TextBlock Text="{Binding Mode, StringFormat={}Режим: {0}}" VerticalAlignment="Center"/>
+                                        <Button Content="Сохранить"
+                                            Command="{Binding Save}"/>
+                                        <Button Content="Отменить"
+                                            Command="{Binding Exit}"/>
+                                    </UniformGrid>
+                                </Grid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Персонажи">
+                            <Grid Background="#FFE5E5E5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <DockPanel Grid.Column="0">
+                                    <TextBox x:Name="SearchTextField3" DockPanel.Dock="Top" Margin="10"
+                                        Text="{Binding SearchText,
+                                        RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
+                                        UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
+                                         SelectedItem="{Binding SelectedC}"
+                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name, Mode=OneTime}"  />
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </DockPanel>
+                                <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+                                <Grid Grid.Column="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.Resources>
+                                        <Style TargetType="TextBox">
+                                            <Setter Property="IsReadOnly" Value="{Binding Mode, Converter={local:ViewMode}}"/>
+                                        </Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Margin" Value="5"/>
+                                            <Setter Property="Padding" Value="15 5"/>
+                                        </Style>
+                                    </Grid.Resources>
+                                    <ScrollViewer Grid.Row="1" Background="Gray">
+                                        <ScrollViewer.Resources>
+                                            <Style TargetType="TextBox">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}"
+                                                                 Value="View">
+                                                        <Setter Property="IsReadOnly" Value="True"/>
+                                                        <Setter Property="IsReadOnlyCaretVisible" Value="True"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ScrollViewer.Resources>
+                                        <Grid x:Name="GridStatsCEnter" Background="Gray"   
+                                              d:DataContext="{d:DesignInstance Type=models:Character}">
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Setter Property="DataContext" Value="{Binding EditableC}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}" Value="View">
+                                                            <Setter Property="DataContext" Value="{Binding SelectedC}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Название:" Margin="5"/>
+                                                <TextBox x:Name="NameStatsC" Text="{Binding Name}" Grid.Column="1" Margin="5" MaxLength="100"/>
+                                            </Grid>
+
+                                            <Grid Grid.Row="1" Margin="3">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Column="0" Grid.Row="1" Text="ББ"/>
+                                                <TextBox x:Name="BBStatsC" Grid.Column="0" Grid.Row="2" Text="{Binding Melee}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True" />
+                                                <TextBlock Grid.Column="1" Grid.Row="1" Text="Б"/>
+                                                <TextBox x:Name="BStatsC" Grid.Column="1" Grid.Row="2" Text="{Binding Ballistics}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBlock Grid.Column="2" Grid.Row="1" Text="Сил"/>
+                                                <TextBox x:Name="PowStatsC" Grid.Column="2" Grid.Row="2" Text="{Binding Power}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBlock Grid.Column="3" Grid.Row="1" Text="Вын"/>
+                                                <TextBox x:Name="EndurStatsC" Grid.Column="3" Grid.Row="2" Text="{Binding Endurance}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBlock Grid.Column="4" Grid.Row="1" Text="Лов"/>
+                                                <TextBox x:Name="DexStatsC" Grid.Column="4" Grid.Row="2" Text="{Binding Dexterity}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBlock Grid.Column="5" Grid.Row="1" Text="Инт"/>
+                                                <TextBox x:Name="IntStatC" Grid.Column="5" Grid.Row="2" Text="{Binding Intelligence}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBlock Grid.Column="6" Grid.Row="1" Text="Вос"/>
+                                                <TextBox x:Name="PerStatsC" Grid.Column="6" Grid.Row="2" Text="{Binding Perception}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBlock Grid.Column="7" Grid.Row="1" Text="СВ"/>
+                                                <TextBox x:Name="WillPowStatsC" Grid.Column="7" Grid.Row="2" Text="{Binding Willpower}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBlock Grid.Column="8" Grid.Row="1" Text="Тов"/>
+                                                <TextBox x:Name="PartStatsC" Grid.Column="8" Grid.Row="2" Text="{Binding Partnership}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                             </Grid>
 
 

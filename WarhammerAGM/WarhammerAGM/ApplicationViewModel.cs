@@ -23,9 +23,6 @@ namespace WarhammerAGM
         private readonly ApplicationContext db = new ApplicationContext();
         public ObservableCollection<BestiaryCreature> BestiaryCreatures { get; }
 
-        //поиск данных по имени 
-        private readonly CollectionViewSource source = null!;
-
         /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature EditableBC
         {
@@ -103,5 +100,18 @@ namespace WarhammerAGM
         {
             ListCubeCollection.Clear();
         });
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public ObservableCollection<Character> Characters { get; }
+        public Character EditableC
+        {
+            get => Get<Character>()!;
+            private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
+        }
+        public BestiaryCreature? SelectedC
+        {
+            get => Get<Character>();
+            set => Set(value);
+        }
+
     }
 }
