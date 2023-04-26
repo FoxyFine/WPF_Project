@@ -417,7 +417,7 @@
                                     </UniformGrid>
 
                                     <UniformGrid Rows="1" Columns="3"
-                                                 Visibility="{Binding Mode, Converter={local:ViewMode True}}">
+                                                 Visibility="{Binding Mode, Converter={local:ViewModeC True}}">
                                         <TextBlock Text="{Binding Mode, StringFormat={}Режим: {0}}" VerticalAlignment="Center"/>
                                         <Button Content="Сохранить"
                                             Command="{Binding Save}"/>
@@ -441,7 +441,7 @@
                                         UpdateSourceTrigger=PropertyChanged}"/>
                                     <ListBox ItemsSource="{Binding Source={StaticResource characterView}}"
                                          SelectedItem="{Binding SelectedC}"
-                                         IsEnabled="{Binding ModeC, Converter={local:ViewMode}}">
+                                         IsEnabled="{Binding ModeC, Converter={local:ViewModeC}}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding Name, Mode=OneTime}"  />
@@ -458,7 +458,7 @@
                                     </Grid.RowDefinitions>
                                     <Grid.Resources>
                                         <Style TargetType="TextBox">
-                                            <Setter Property="IsReadOnly" Value="{Binding ModeC, Converter={local:ViewMode}}"/>
+                                            <Setter Property="IsReadOnly" Value="{Binding ModeC, Converter={local:ViewModeC}}"/>
                                         </Style>
                                         <Style TargetType="Button">
                                             <Setter Property="Margin" Value="5"/>
@@ -615,7 +615,7 @@
                                     <UniformGrid Grid.Row="2"
                                                  Rows="2"
                                                  Columns="2"
-                                                 Visibility="{Binding ModeC, Converter={local:ViewMode}}">
+                                                 Visibility="{Binding ModeC, Converter={local:ViewModeC}}">
                                         <Button Grid.Column="0" Content="Добавить" Command="{Binding AddC}"/>
                                         <Button Grid.Column="2" Content="Клонировать" Command="{Binding CloneC}"/>
                                         <Button Grid.Column="0" Content="Редактировать" Command="{Binding UpdateC}"/>
@@ -623,7 +623,7 @@
                                     </UniformGrid>
 
                                     <UniformGrid Rows="1" Columns="3"
-                                                 Visibility="{Binding ModeC, Converter={local:ViewMode True}}">
+                                                 Visibility="{Binding ModeC, Converter={local:ViewModeC True}}">
                                         <TextBlock Text="{Binding ModeC, StringFormat={}Режим: {0}}" VerticalAlignment="Center"/>
                                         <Button Content="Сохранить"
                                             Command="{Binding SaveC}"/>

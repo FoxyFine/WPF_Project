@@ -1,11 +1,11 @@
 ﻿using Mapping;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Linq;
+using System.Windows;
 using ViewModels;
 using WarhammerAGM.Models;
-using System.Windows;
 
 namespace WarhammerAGM
 {
