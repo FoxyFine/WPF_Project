@@ -14,12 +14,129 @@
     <Window.Resources>
         <local:ApplicationViewModel x:Key="vm"/>
         <CollectionViewSource x:Key="bestiaryCreatureView" Source="{Binding BestiaryCreatures}"/>
+        <CollectionViewSource x:Key="bestiaryCreatureEdit" Source="{Binding BestiaryCreatures}"/>
+        <CollectionViewSource x:Key="characterView" Source="{Binding Characters}"/>
     </Window.Resources>
 
     <Grid>
         <TabControl FontSize="36" SelectedIndex="1">
-            <TabItem Header="ТАБ ИТЭМ">
-                <Grid Background="#FFE5E5E5"/>
+            <TabItem Header="Бестиарий">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <DockPanel Grid.Column="0">
+                        <TextBox x:Name="SearchTextField0" DockPanel.Dock="Top" Margin="10"
+                Text="{Binding SearchTextBCView,
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
+                            UpdateSourceTrigger=PropertyChanged}"/>
+                        <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
+                                         SelectedItem="{Binding SelectedBC}"
+                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name, Mode=OneTime}"  />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                    <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+                    <ScrollViewer Grid.Column="2">
+                        <Grid d:DataContext="{d:DesignInstance Type=models:BestiaryCreature}">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Setter Property="DataContext" Value="{Binding EditableBCView}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}" Value="View">
+                                            <Setter Property="DataContext" Value="{Binding SelectedBCView}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Название: " FontSize="24"/>
+                                    <TextBlock Text="{Binding Name}" FontSize="24"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Раны: " FontSize="24"/>
+                                    <TextBlock Text="{Binding Wounds}" FontSize="24"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Скорость: " FontSize="24"/>
+                                    <TextBlock Text="{Binding Speed}" FontSize="24"/>
+                                </StackPanel>
+                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                    <UniformGrid Margin="3" Columns="9" Rows="2" Background="Khaki">
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="0" Text="ББ" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="1" Text="Б" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="2" Text="Сил" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="3" Text="Вын" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="4" Text="Лов" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="5" Text="Инт" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="6" Text="Вос" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="7" Text="СВ" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock Grid.Column="8" Text="Тов" Margin="3,0,3,0" FontSize="24" FontWeight="Bold"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="BBStats" Text="{Binding Melee}" FontSize="24"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="BStats" Text="{Binding Ballistics}" FontSize="24"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="PowStats" Text="{Binding Power}" FontSize="24"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="EndurStats" Text="{Binding Endurance}" FontSize="24"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="DexStats" Text="{Binding Dexterity}" FontSize="24"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="IntStats" Text="{Binding Intelligence}" FontSize="24"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="PerStats" Text="{Binding Perception}" FontSize="24"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="WillPowStats" Text="{Binding Willpower}" FontSize="24"/>
+                                        </Border>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <TextBlock x:Name="PartStats" Text="{Binding Partnership}" FontSize="24"/>
+                                        </Border>
+                                    </UniformGrid>
+                                </Border>
+                                <TextBlock Text="Навыки:" FontSize="24"/>
+                                <TextBlock Text="{Binding Skills}" FontSize="24"/>
+                                <TextBlock Text="Таланты:" FontSize="24"/>
+                                <TextBlock Text="{Binding Talents}" FontSize="24"/>
+                                <Expander Header="Описание" FontSize="24">
+                                    <TextBlock Text="{Binding Description}" FontSize="24"/>
+                                </Expander>
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
             </TabItem>
             <TabItem Header="Инициатива">
                 <Grid Background="White">
@@ -113,10 +230,10 @@
                                 </Grid.ColumnDefinitions>
                                 <DockPanel Grid.Column="0">
                                     <TextBox x:Name="SearchTextField2" DockPanel.Dock="Top" Margin="10"
-                                        Text="{Binding SearchText,
+                                        Text="{Binding SearchTextBCEdit,
                                         RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
                                         UpdateSourceTrigger=PropertyChanged}"/>
-                                    <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
+                                    <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureEdit}}"
                                          SelectedItem="{Binding SelectedBC}"
                                          IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
                                         <ListBox.ItemTemplate>
@@ -200,23 +317,23 @@
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Grid.Column="0" Grid.Row="1" Text="ББ"/>
-                                                <TextBox x:Name="BBStats" Grid.Column="0" Grid.Row="2" Text="{Binding Melee}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True" />
+                                                <TextBox x:Name="BBStatsRead" Grid.Column="0" Grid.Row="2" Text="{Binding Melee}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True" />
                                                 <TextBlock Grid.Column="1" Grid.Row="1" Text="Б"/>
-                                                <TextBox x:Name="BStats" Grid.Column="1" Grid.Row="2" Text="{Binding Ballistics}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="BStatsRead" Grid.Column="1" Grid.Row="2" Text="{Binding Ballistics}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="2" Grid.Row="1" Text="Сил"/>
-                                                <TextBox x:Name="PowStats" Grid.Column="2" Grid.Row="2" Text="{Binding Power}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PowStatsRead" Grid.Column="2" Grid.Row="2" Text="{Binding Power}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="3" Grid.Row="1" Text="Вын"/>
-                                                <TextBox x:Name="EndurStats" Grid.Column="3" Grid.Row="2" Text="{Binding Endurance}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="EndurStatsRead" Grid.Column="3" Grid.Row="2" Text="{Binding Endurance}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="4" Grid.Row="1" Text="Лов"/>
-                                                <TextBox x:Name="DexStats" Grid.Column="4" Grid.Row="2" Text="{Binding Dexterity}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="DexStatsRead" Grid.Column="4" Grid.Row="2" Text="{Binding Dexterity}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="5" Grid.Row="1" Text="Инт"/>
-                                                <TextBox x:Name="IntStats" Grid.Column="5" Grid.Row="2" Text="{Binding Intelligence}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="IntStatsRead" Grid.Column="5" Grid.Row="2" Text="{Binding Intelligence}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="6" Grid.Row="1" Text="Вос"/>
-                                                <TextBox x:Name="PerStats" Grid.Column="6" Grid.Row="2" Text="{Binding Perception}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PerStatsRead" Grid.Column="6" Grid.Row="2" Text="{Binding Perception}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="7" Grid.Row="1" Text="СВ"/>
-                                                <TextBox x:Name="WillPowStats" Grid.Column="7" Grid.Row="2" Text="{Binding Willpower}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="WillPowStatsRead" Grid.Column="7" Grid.Row="2" Text="{Binding Willpower}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="8" Grid.Row="1" Text="Тов"/>
-                                                <TextBox x:Name="PartStats" Grid.Column="8" Grid.Row="2" Text="{Binding Partnership}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PartStatsRead" Grid.Column="8" Grid.Row="2" Text="{Binding Partnership}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                             </Grid>
 
 
@@ -319,12 +436,12 @@
                                 </Grid.ColumnDefinitions>
                                 <DockPanel Grid.Column="0">
                                     <TextBox x:Name="SearchTextField3" DockPanel.Dock="Top" Margin="10"
-                                        Text="{Binding SearchText,
+                                        Text="{Binding SearchTextC,
                                         RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
                                         UpdateSourceTrigger=PropertyChanged}"/>
-                                    <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
+                                    <ListBox ItemsSource="{Binding Source={StaticResource characterView}}"
                                          SelectedItem="{Binding SelectedC}"
-                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
+                                         IsEnabled="{Binding ModeC, Converter={local:ViewMode}}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding Name, Mode=OneTime}"  />
@@ -341,7 +458,7 @@
                                     </Grid.RowDefinitions>
                                     <Grid.Resources>
                                         <Style TargetType="TextBox">
-                                            <Setter Property="IsReadOnly" Value="{Binding Mode, Converter={local:ViewMode}}"/>
+                                            <Setter Property="IsReadOnly" Value="{Binding ModeC, Converter={local:ViewMode}}"/>
                                         </Style>
                                         <Style TargetType="Button">
                                             <Setter Property="Margin" Value="5"/>
@@ -352,7 +469,7 @@
                                         <ScrollViewer.Resources>
                                             <Style TargetType="TextBox">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}"
+                                                    <DataTrigger Binding="{Binding ModeC, Source={StaticResource vm}}"
                                                                  Value="View">
                                                         <Setter Property="IsReadOnly" Value="True"/>
                                                         <Setter Property="IsReadOnlyCaretVisible" Value="True"/>
@@ -366,7 +483,7 @@
                                                 <Style TargetType="Grid">
                                                     <Setter Property="DataContext" Value="{Binding EditableC}"/>
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}" Value="View">
+                                                        <DataTrigger Binding="{Binding ModeC, Source={StaticResource vm}}" Value="View">
                                                             <Setter Property="DataContext" Value="{Binding SelectedC}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
@@ -498,20 +615,20 @@
                                     <UniformGrid Grid.Row="2"
                                                  Rows="2"
                                                  Columns="2"
-                                                 Visibility="{Binding Mode, Converter={local:ViewMode}}">
-                                        <Button Grid.Column="0" Content="Добавить" Command="{Binding Add}"/>
-                                        <Button Grid.Column="2" Content="Клонировать" Command="{Binding Clone}"/>
-                                        <Button Grid.Column="0" Content="Редактировать" Command="{Binding Update}"/>
+                                                 Visibility="{Binding ModeC, Converter={local:ViewMode}}">
+                                        <Button Grid.Column="0" Content="Добавить" Command="{Binding AddC}"/>
+                                        <Button Grid.Column="2" Content="Клонировать" Command="{Binding CloneC}"/>
+                                        <Button Grid.Column="0" Content="Редактировать" Command="{Binding UpdateC}"/>
                                         <Button Grid.Column="2" Content="Удалить" Command="{Binding DeleteCommand}"/>
                                     </UniformGrid>
 
                                     <UniformGrid Rows="1" Columns="3"
-                                                 Visibility="{Binding Mode, Converter={local:ViewMode True}}">
-                                        <TextBlock Text="{Binding Mode, StringFormat={}Режим: {0}}" VerticalAlignment="Center"/>
+                                                 Visibility="{Binding ModeC, Converter={local:ViewMode True}}">
+                                        <TextBlock Text="{Binding ModeC, StringFormat={}Режим: {0}}" VerticalAlignment="Center"/>
                                         <Button Content="Сохранить"
-                                            Command="{Binding Save}"/>
+                                            Command="{Binding SaveC}"/>
                                         <Button Content="Отменить"
-                                            Command="{Binding Exit}"/>
+                                            Command="{Binding ExitC}"/>
                                     </UniformGrid>
                                 </Grid>
                             </Grid>

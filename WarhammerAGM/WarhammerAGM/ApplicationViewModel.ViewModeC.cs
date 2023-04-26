@@ -1,72 +1,68 @@
 ﻿using Mapping;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using System.Windows;
 using ViewModels;
 using WarhammerAGM.Models;
+using System.Windows;
 
 namespace WarhammerAGM
 {
     public partial class ApplicationViewModel
     {
-        public ViewMode Mode { get => Get<ViewMode>(); private set => Set(value); }
+        public ViewModeC ModeC { get => Get<ViewModeC>(); private set => Set(value); }
 
-        public RelayCommand Update => GetCommand
+        public RelayCommand UpdateC => GetCommand
         (
             () =>
             {
-                EditableBC = SelectedBC!.Create<BestiaryCreature>();
-                Mode = ViewMode.Update;
+                EditableC = SelectedC!.Create<Character>();
+                ModeC = ViewModeC.UpdateC;
             },
-            () => SelectedBC is not null
+            () => SelectedC is not null
         );
-
-        public RelayCommand Add => GetCommand
+        public RelayCommand AddC => GetCommand
         (
             () =>
             {
-                EditableBC = new BestiaryCreature();
-                Mode = ViewMode.Add;
+                EditableC = new Character();
+                ModeC = ViewModeC.AddC;
 
             }
         );
-
-        public RelayCommand Clone => GetCommand
+        public RelayCommand CloneC => GetCommand
         (
             () =>
             {
-                EditableBC = SelectedBC!.Create<BestiaryCreature>();
-                EditableBC.Id = 0;
-                Mode = ViewMode.Add;
+                EditableC = SelectedC!.Create<Character>();
+                EditableC.Id = 0;
+                ModeC = ViewModeC.AddC;
             },
-            () => SelectedBC is not null
+            () => SelectedC is not null
         );
-
-        public RelayCommand Exit => GetCommand
+        public RelayCommand ExitC => GetCommand
         (
             () =>
             {
-                Mode = ViewMode.View;
-                SelectedBC = null;
+                ModeC = ViewModeC.ViewC;
+                SelectedC = null;
             }
         );
-
-        public RelayCommand Save => GetCommand
+        public RelayCommand SaveC => GetCommand
         (
             () =>
             {
-                if (Mode == ViewMode.Add)
+                if (ModeC == ViewModeC.AddC)
                 {
-                    if (db.BestiaryCreatures.Find(EditableBC.Id) is not null)
+                    if (db.Characters.Find(EditableC.Id) is not null)
                     {
                         MessageBox.Show("Такое Id уже существует");
                         return;
                     }
                     else
                     {
-                        EntityEntry<BestiaryCreature> entry = db.BestiaryCreatures.Add(EditableBC);
+                        EntityEntry<Character> entry = db.Characters.Add(EditableC);
                         try
                         {
                             db.SaveChanges();
@@ -79,9 +75,9 @@ namespace WarhammerAGM
                         }
                     }
                 }
-                else if (Mode == ViewMode.Update)
+                else if (ModeC == ViewModeC.UpdateC)
                 {
-                    int index = BestiaryCreatures.TakeWhile(bc => bc.Id != EditableBC.Id).Count();
+                    int index = Characters.TakeWhile(bc => bc.Id != EditableC.Id).Count();
                     if (index < 0)
                     {
                         MessageBox.Show("Такого Id не существует");
@@ -89,25 +85,24 @@ namespace WarhammerAGM
                     }
                     else
                     {
-                        BestiaryCreature bestCrOld = BestiaryCreatures[index];
+                        Character bestCrOld = Characters[index];
                         try
                         {
-                            BestiaryCreatures[index] = EditableBC;
+                            Characters[index] = EditableC;
                             db.SaveChanges();
                         }
                         catch (Exception ex)
                         {
-                            BestiaryCreatures[index] = bestCrOld;
+                            Characters[index] = bestCrOld;
                             MessageBox.Show("Такое название уже существует");
                             return;
                         }
                     }
                 }
                 MessageBox.Show("Сохранение прошло успешно");
-                Mode = ViewMode.View;
+                ModeC = ViewModeC.ViewC;
             }
         );
+        public enum ViewModeC { ViewC, UpdateC, AddC }
     }
-
-    public enum ViewMode { View, Update, Add }
 }
