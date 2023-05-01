@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace WarhammerAGM.Models
 {
+    [Index(nameof(Name), IsUnique = true)]
     public partial class Character
     {
         [Key]
@@ -51,5 +53,10 @@ namespace WarhammerAGM.Models
         public string? AdditionalFeatures { get; set; }
 
         public string? Features { get; set; }
+        public bool OnOfCharacter { get; set; }
+        public Character()
+        {
+            OnOfCharacter = false;
+        }
     }
 }

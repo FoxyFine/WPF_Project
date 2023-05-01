@@ -2,6 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
@@ -18,10 +19,10 @@ namespace WarhammerAGM
             db.Characters.Load();
             EditableBC = new();
             EditableBCView = new();
+            EditableC_CheckBox = new();
             EditableC = new();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
             Characters = db.Characters.Local.ToObservableCollection();
-
         }
 
         private readonly ApplicationContext db = new ApplicationContext();
@@ -43,6 +44,11 @@ namespace WarhammerAGM
             get => Get<Character>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
         }
+        public Character EditableC_CheckBox
+        {
+            get => Get<Character>()!;
+            private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
+        }
         /// <summary>Выбранная сущность.</summary>
         public BestiaryCreature? SelectedBC
         {
@@ -55,6 +61,11 @@ namespace WarhammerAGM
             set => Set(value);
         }
         public Character? SelectedC
+        {
+            get => Get<Character?>();
+            set => Set(value);
+        }
+        public Character? SelectedC_CheckBox
         {
             get => Get<Character?>();
             set => Set(value);
@@ -88,6 +99,42 @@ namespace WarhammerAGM
                 else
                     EditableC = db.Characters.AsNoTracking().First(bc => bc.Id == @new.Id);
             }
+            if (propertyName == nameof(SelectedC_CheckBox))
+            {
+                Character? @new = (Character?)newValue;
+                if (@new is null)
+                {
+                    EditableC_CheckBox = new();
+                    return;
+                }
+                else
+                    EditableC_CheckBox = db.Characters.AsNoTracking().First(bc => bc.Id == @new.Id);
+                int index = Characters.TakeWhile(bc => bc.Id != EditableC_CheckBox.Id).Count();
+                if (EditableC_CheckBox.OnOfCharacter == false)
+                    EditableC_CheckBox.OnOfCharacter = true;
+                else
+                    EditableC_CheckBox.OnOfCharacter = false;
+                if (index < 0)
+                {
+                    MessageBox.Show("Такого Id не существует");
+                    return;
+                }
+                else
+                {
+                    Character bestCrOld = Characters[index];
+                    try
+                    {
+                        Characters[index] = EditableC_CheckBox;
+                        db.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        Characters[index] = bestCrOld;
+                        MessageBox.Show("Что-то пошло не так..");
+                        return;
+                    }
+                }
+            }
         }
         /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
         public RelayCommand DeleteCommand => GetCommand(
@@ -96,6 +143,16 @@ namespace WarhammerAGM
                 if (SelectedBC is BestiaryCreature selectedItem)
                 {
                     db.BestiaryCreatures.Remove(selectedItem);
+                    db.SaveChanges();
+                }
+            },
+            () => SelectedBC is BestiaryCreature);
+        public RelayCommand DeleteCommandC => GetCommand(
+            () =>
+            {
+                if (SelectedC is Character selectedItem)
+                {
+                    db.Characters.Remove(selectedItem);
                     db.SaveChanges();
                 }
             },

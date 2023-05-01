@@ -13,7 +13,7 @@ namespace WarhammerAGM
         {
             if (MessageBox.Show("Удалить БД?", "Старт", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                File.Delete("Bestiary.db");
+                File.Delete("AGM.db");
             }
         }
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

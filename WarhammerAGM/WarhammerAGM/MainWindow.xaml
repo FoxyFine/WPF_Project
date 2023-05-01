@@ -151,8 +151,7 @@
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
                             UpdateSourceTrigger=PropertyChanged}"/>
                         <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
-                                         SelectedItem="{Binding SelectedBC}"
-                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
+                                         SelectedItem="{Binding SelectedBC}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name, Mode=OneTime}"  />
@@ -181,34 +180,49 @@
                                             <Button MinHeight="50" MinWidth="50" Margin="12,0,3,0" ToolTip="Очистить поле и окончить бой"/>
                                         </StackPanel>
                                         <ListBox Grid.Row="1">
-                                            <StackPanel Orientation="Horizontal" MinWidth="440">
-                                                <StackPanel Orientation="Vertical" MinWidth="100">
-                                                    <TextBlock Text="Name" FontSize="22"/>
-                                                    <Slider Value="0" Minimum="0" Maximum="100" SelectionStart="0" Height="30"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Vertical">
-                                                    <TextBlock Text="Состояния" FontSize="22"/>
-                                                </StackPanel>
-                                            </StackPanel>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Vertical">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Name}" FontSize="22" MinWidth="100"/>
+                                                            <StackPanel Orientation="Horizontal" Margin="10">
+                                                                <Slider x:Name="slValue" Maximum="{Binding Wounds}" IsSnapToTickEnabled="True" MinWidth="100" Value="1000"/>
+                                                                <TextBlock Text="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"/>
+                                                            </StackPanel>
+                                                            <Expander Header="Характеристики" FontSize="22">
+
+                                                            </Expander>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
                                         </ListBox>
                                     </Grid>
                                 </ScrollViewer>
                             </TabItem>
                             <TabItem Header="Персонажи">
                                 <Grid Background="#FFE5E5E5">
-                                    <ListBox>
-                                        <StackPanel Orientation="Vertical">
-                                            <StackPanel>
-                                                <TextBlock Text="Name" FontSize="22" MinWidth="100"/>
+                                    <ListBox ItemsSource="{Binding Characters}"
+                                              SelectedItem="{Binding SelectedC_CheckBox}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Slider Value="0" Minimum="0" Maximum="100" SelectionStart="0" Height="30" MinWidth="150"/>
-                                                    <TextBox Text="HP" FontSize="22"/>
+                                                    <CheckBox IsChecked="{Binding OnOfCharacter}" IsEnabled="False"/>
+                                                    <StackPanel Orientation="Vertical">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Name}" FontSize="22" MinWidth="100"/>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="Раны:" FontSize="22"/>
+                                                                <TextBlock Text="{Binding Wounds}" FontSize="22"/>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                        <Expander Header="Характеристики" FontSize="22">
+
+                                                        </Expander>
+                                                    </StackPanel>
                                                 </StackPanel>
-                                                <Expander Header="Характеристики">
-                                                    
-                                                </Expander>
-                                            </StackPanel>
-                                        </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
                                     </ListBox>
                                 </Grid>
                             </TabItem>
@@ -470,7 +484,7 @@
                                             <Style TargetType="TextBox">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding ModeC, Source={StaticResource vm}}"
-                                                                 Value="View">
+                                                                 Value="ViewC">
                                                         <Setter Property="IsReadOnly" Value="True"/>
                                                         <Setter Property="IsReadOnlyCaretVisible" Value="True"/>
                                                     </DataTrigger>
@@ -619,7 +633,7 @@
                                         <Button Grid.Column="0" Content="Добавить" Command="{Binding AddC}"/>
                                         <Button Grid.Column="2" Content="Клонировать" Command="{Binding CloneC}"/>
                                         <Button Grid.Column="0" Content="Редактировать" Command="{Binding UpdateC}"/>
-                                        <Button Grid.Column="2" Content="Удалить" Command="{Binding DeleteCommand}"/>
+                                        <Button Grid.Column="2" Content="Удалить" Command="{Binding DeleteCommandC}"/>
                                     </UniformGrid>
 
                                     <UniformGrid Rows="1" Columns="3"
