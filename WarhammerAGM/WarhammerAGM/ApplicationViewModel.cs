@@ -2,7 +2,9 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows;
+using System.Windows.Data;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
@@ -17,17 +19,21 @@ namespace WarhammerAGM
             db.Database.EnsureCreated();
             db.BestiaryCreatures.Load();
             db.Characters.Load();
+            db.Initiatives.Load();
             EditableBC = new();
             EditableBCView = new();
             EditableC_CheckBox = new();
             EditableC = new();
+            EditableI = new();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
             Characters = db.Characters.Local.ToObservableCollection();
+            Initiatives = db.Initiatives.Local.ToObservableCollection();
         }
 
         private readonly ApplicationContext db = new ApplicationContext();
         public ObservableCollection<BestiaryCreature> BestiaryCreatures { get; }
         public ObservableCollection<Character> Characters { get; }
+        public ObservableCollection<Initiative> Initiatives { get; }
         /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature EditableBC
         {
@@ -49,6 +55,11 @@ namespace WarhammerAGM
             get => Get<Character>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
         }
+        public Initiative EditableI
+        {
+            get => Get<Initiative>()!;
+            private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
+        }
         /// <summary>Выбранная сущность.</summary>
         public BestiaryCreature? SelectedBC
         {
@@ -68,6 +79,11 @@ namespace WarhammerAGM
         public Character? SelectedC_CheckBox
         {
             get => Get<Character?>();
+            set => Set(value);
+        }
+        public Initiative? SelectedI
+        {
+            get => Get<Initiative?>();
             set => Set(value);
         }
 
@@ -104,11 +120,11 @@ namespace WarhammerAGM
                 Character? @new = (Character?)newValue;
                 if (@new is null)
                 {
-                    EditableC_CheckBox = new();
+                    EditableI = new();
                     return;
                 }
                 else
-                    EditableC_CheckBox = db.Characters.AsNoTracking().First(bc => bc.Id == @new.Id);
+                    EditableI = db.Initiatives.AsNoTracking().First(bc => bc.Id == @new.Id);
                 int index = Characters.TakeWhile(bc => bc.Id != EditableC_CheckBox.Id).Count();
                 if (EditableC_CheckBox.OnOfCharacter == false)
                     EditableC_CheckBox.OnOfCharacter = true;
@@ -135,6 +151,15 @@ namespace WarhammerAGM
                     }
                 }
             }
+            if(propertyName == nameof(SelectedI)) 
+            {
+                Initiative? @new = (Initiative?)newValue;
+                if (@new is null)
+                {
+                    EditableI = new();
+                    return;
+                }
+            }
         }
         /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
         public RelayCommand DeleteCommand => GetCommand(
@@ -157,6 +182,45 @@ namespace WarhammerAGM
                 }
             },
             () => SelectedBC is BestiaryCreature);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public RelayCommand SliderChangeInitiative => GetCommand(
+            (Value) =>
+            {
+                
+            }
+            );
+        public RelayCommand AddCreatureInitiative => GetCommand(
+            () =>
+            {           
+                foreach (Character character in Characters)
+                {
+                    int k = 0;
+                    if (character.OnOfCharacter == true)
+                    {
+                        foreach (Initiative initiative in Initiatives) 
+                        {
+                            if (character.Name == initiative.Name)
+                            {
+                                k = 1;
+                                break;
+                            }
+                        }
+                        if (k == 1)
+                            continue;
+                        EditableI = new()
+                        {
+                            Name = character.Name,
+                            DexterityModifier = character.Dexterity / 10,
+                            Wounds = character.Wounds,
+                            Importancenitiative = 0,
+                            СurrentWounds = character.Wounds
+                        };
+                        Initiatives.Add(EditableI);
+                        db.SaveChanges();
+                    }
+                }
+            });
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public RollCube RollCube
         {

@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        xmlns:local="clr-namespace:WarhammerAGM" xmlns:models="clr-namespace:WarhammerAGM.Models"
+        xmlns:local="clr-namespace:WarhammerAGM" xmlns:models="clr-namespace:WarhammerAGM.Models" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="MainWindow" Height="540" Width="960"
         FontSize="16"
@@ -165,40 +165,49 @@
                     <Grid Grid.Column="2">
                         <TabControl>
                             <TabItem Header="Инициатива">
-                                <ScrollViewer>
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*"/>
-                                        </Grid.RowDefinitions>
-                                        <StackPanel Orientation="Horizontal" Grid.Row="0">
-                                            <TextBlock Text="0" Margin="3,0,3,0" ToolTip="Номер Раунда"/>
-                                            <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Следующий ход"/>
-                                            <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Завершение раунда и начало нового"/>
-                                            <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Пересчитать инициативу мобов"/>
-                                            <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Добавить игроков в инициативу"/>
-                                            <Button MinHeight="50" MinWidth="50" Margin="12,0,3,0" ToolTip="Очистить поле и окончить бой"/>
-                                        </StackPanel>
-                                        <ListBox Grid.Row="1">
-                                            <ListBox.ItemTemplate>
-                                                <DataTemplate>
-                                                    <StackPanel Orientation="Vertical">
-                                                        <StackPanel>
-                                                            <TextBlock Text="{Binding Name}" FontSize="22" MinWidth="100"/>
-                                                            <StackPanel Orientation="Horizontal" Margin="10">
-                                                                <Slider x:Name="slValue" Maximum="{Binding Wounds}" IsSnapToTickEnabled="True" MinWidth="100" Value="1000"/>
-                                                                <TextBlock Text="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"/>
-                                                            </StackPanel>
-                                                            <Expander Header="Характеристики" FontSize="22">
-
-                                                            </Expander>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Horizontal" Grid.Row="0">
+                                        <TextBlock Text="0" Margin="3,0,3,0" ToolTip="Номер Раунда"/>
+                                        <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Следующий ход"/>
+                                        <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Завершение раунда и начало нового"/>
+                                        <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Пересчитать инициативу мобов"/>
+                                        <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Добавить игроков в инициативу" Command="{Binding AddCreatureInitiative}">
+                                            <Image Source = "/icons8-мужчина-стоит-50.png"/>
+                                        </Button>
+                                        <Button MinHeight="50" MinWidth="50" Margin="12,0,3,0" ToolTip="Очистить поле и окончить бой"/>
+                                    </StackPanel>
+                                    <ListBox Grid.Row="1" ItemsSource="{Binding Initiatives}" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectedItem="{Binding SelectedI}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Vertical">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Name}" FontSize="22" MinWidth="100"/>
+                                                        <StackPanel Orientation="Horizontal" Margin="10">
+                                                            <Slider x:Name="slValue" Maximum="{Binding Wounds}" Value="{Binding Wounds, Mode=OneTime}" IsSnapToTickEnabled="True" MinWidth="100" ToolTip="{Binding MinPlusSlider}">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="ValueChanged">
+                                                                        <i:InvokeCommandAction 
+                                                                            Command="{Binding SliderChangeInitiative}"
+                                                                            CommandParameter="{Binding Value}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </Slider>
+                                                            <TextBlock Text="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="Инициатива: "/>
+                                                            <TextBox Text="{Binding Importancenitiative}" MaxLength="2"/>
                                                         </StackPanel>
                                                     </StackPanel>
-                                                </DataTemplate>
-                                            </ListBox.ItemTemplate>
-                                        </ListBox>
-                                    </Grid>
-                                </ScrollViewer>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Grid>
                             </TabItem>
                             <TabItem Header="Персонажи">
                                 <Grid Background="#FFE5E5E5">

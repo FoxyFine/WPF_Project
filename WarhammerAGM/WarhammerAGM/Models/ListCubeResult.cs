@@ -10,7 +10,7 @@ namespace WarhammerAGM.Models
 {
     public partial class ListCube : INotifyPropertyChanged
     {
-        string _namecube;
+        string? _namecube;
         string? _cuberesult;
         string? _cuberesulttooltip;
         public string? CubeResult

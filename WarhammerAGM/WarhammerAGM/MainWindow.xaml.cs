@@ -103,6 +103,5 @@ namespace WarhammerAGM
 
             characterView.Filter += filter;
         }
-
     }
 }

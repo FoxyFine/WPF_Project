@@ -15,9 +15,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\ofont.ru_Vinque Rg.ttf" />
+    <None Remove="icons8-мужчина-стоит-50.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.5.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\ofont.ru_Vinque Rg.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="icons8-мужчина-стоит-50.png" />
   </ItemGroup>
 
 </Project>
