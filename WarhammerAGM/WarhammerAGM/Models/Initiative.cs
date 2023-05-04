@@ -14,10 +14,14 @@ namespace WarhammerAGM.Models
         [Key]
         public int Id { get; set; }
         public string? Name {get; set; }
-       /* public string? Type { get; set; }*/
+        public string? Type { get; set; }
+        public int? MinPlusSlider { get; set; }
         public int? Wounds { get; set; }
         public int? СurrentWounds { get; set; }
         public int? DexterityModifier { get; set; }
         public int? Importancenitiative { get; set; }
+        public Initiative() {
+            MinPlusSlider = 0;
+        } 
     }
 }

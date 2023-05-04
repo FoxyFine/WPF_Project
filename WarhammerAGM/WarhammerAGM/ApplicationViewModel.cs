@@ -2,12 +2,11 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows;
-using System.Windows.Data;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace WarhammerAGM
 {
@@ -120,11 +119,11 @@ namespace WarhammerAGM
                 Character? @new = (Character?)newValue;
                 if (@new is null)
                 {
-                    EditableI = new();
+                    EditableC_CheckBox = new();
                     return;
                 }
                 else
-                    EditableI = db.Initiatives.AsNoTracking().First(bc => bc.Id == @new.Id);
+                    EditableC_CheckBox = db.Characters.AsNoTracking().First(bc => bc.Id == @new.Id);
                 int index = Characters.TakeWhile(bc => bc.Id != EditableC_CheckBox.Id).Count();
                 if (EditableC_CheckBox.OnOfCharacter == false)
                     EditableC_CheckBox.OnOfCharacter = true;
@@ -159,6 +158,8 @@ namespace WarhammerAGM
                     EditableI = new();
                     return;
                 }
+                else
+                    EditableI = db.Initiatives.AsNoTracking().First(bc => bc.Id == @new.Id);
             }
         }
         /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
@@ -183,12 +184,38 @@ namespace WarhammerAGM
             },
             () => SelectedBC is BestiaryCreature);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        public RelayCommand SliderChangeInitiative => GetCommand(
-            (Value) =>
+
+        private void Initiatives_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            // В этом методе вы можете выполнить дополнительную проверку, когда коллекция изменяется
+            // Например, вы можете проверить, что коллекция содержит только уникальные элементы или что ее размер не превышает некоторого значения
+        }
+        private bool _isToolTipVisible;
+        public bool IsToolTipVisible
+        {
+            get { return _isToolTipVisible; }
+            set { Set(ref _isToolTipVisible, value); }
+        }
+        public RelayCommand ShowToolTipCommand => GetCommand(
+            () =>
             {
-                
-            }
-            );
+                IsToolTipVisible = true;
+            });
+        public RelayCommand HideToolTipCommand => GetCommand(
+            () =>
+            {
+                IsToolTipVisible = false;
+            });
+        public RelayCommand SliderChangeInitiative => GetCommand(
+        (Initiative initiative) =>
+        {
+            EditableI.MinPlusSlider = EditableI.Wounds;
+            EditableI.СurrentWounds = 50;
+            int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
+            Initiative bestCrOld = Initiatives[index];
+            Initiatives[index] = EditableI;
+            db.SaveChanges();
+            });
         public RelayCommand AddCreatureInitiative => GetCommand(
             () =>
             {           

@@ -31,7 +31,7 @@ namespace WarhammerAGM.Models
                 OnPropertyChanged("CubeResultToolTip");
             }
         }
-        public string NameCube
+        public string? NameCube
         {
             get { return _namecube; }
             set
