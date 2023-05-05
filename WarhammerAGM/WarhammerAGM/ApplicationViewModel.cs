@@ -209,12 +209,12 @@ namespace WarhammerAGM
         public RelayCommand SliderChangeInitiative => GetCommand(
         (Initiative initiative) =>
         {
-            EditableI.MinPlusSlider = EditableI.Wounds;
-            EditableI.СurrentWounds = 50;
-            int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
-            Initiative bestCrOld = Initiatives[index];
-            Initiatives[index] = EditableI;
-            db.SaveChanges();
+                EditableI.MinPlusSlider = EditableI.Wounds;
+                EditableI.СurrentWounds = 50;
+                int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
+                Initiative bestCrOld = Initiatives[index];
+                Initiatives[index] = EditableI;
+                db.SaveChanges();
             });
         public RelayCommand AddCreatureInitiative => GetCommand(
             () =>
