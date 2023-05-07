@@ -1,8 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
+using System.Windows.Threading;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
@@ -27,6 +31,7 @@ namespace WarhammerAGM
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
             Characters = db.Characters.Local.ToObservableCollection();
             Initiatives = db.Initiatives.Local.ToObservableCollection();
+            IsToolTipVisible = false;
         }
 
         private readonly ApplicationContext db = new ApplicationContext();
@@ -184,17 +189,26 @@ namespace WarhammerAGM
             },
             () => SelectedBC is BestiaryCreature);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void Initiatives_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            // В этом методе вы можете выполнить дополнительную проверку, когда коллекция изменяется
-            // Например, вы можете проверить, что коллекция содержит только уникальные элементы или что ее размер не превышает некоторого значения
-        }
         private bool _isToolTipVisible;
+
         public bool IsToolTipVisible
         {
-            get { return _isToolTipVisible; }
-            set { Set(ref _isToolTipVisible, value); }
+            get => _isToolTipVisible;
+            set
+            {
+                if (_isToolTipVisible != value)
+                {
+                    _isToolTipVisible = value;
+                    OnPropertyChanged(nameof(IsToolTipVisible));
+                }
+            }
+        }
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         public RelayCommand ShowToolTipCommand => GetCommand(
             () =>
@@ -207,15 +221,24 @@ namespace WarhammerAGM
                 IsToolTipVisible = false;
             });
         public RelayCommand SliderChangeInitiative => GetCommand(
-        (Initiative initiative) =>
+        (double Value) =>
         {
-                EditableI.MinPlusSlider = EditableI.Wounds;
-                EditableI.СurrentWounds = 50;
-                int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
-                Initiative bestCrOld = Initiatives[index];
-                Initiatives[index] = EditableI;
-                db.SaveChanges();
-            });
+            if (EditableI.СurrentWounds != (int)Value)
+            {
+                // Отключить механизм привязки данных временно
+                BindingOperations.DisableCollectionSynchronization(Initiatives);
+                lock (Initiatives)
+                {
+                    EditableI.СurrentWounds = EditableI.Wounds - (EditableI.Wounds - (int)Value);
+                    EditableI.MinPlusSlider = (int)Value - EditableI.Wounds;
+                    int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
+                    Initiatives[index] = EditableI;
+                    db.SaveChanges();
+                }
+                // Включить механизм привязки данных снова
+                BindingOperations.EnableCollectionSynchronization(Initiatives, new object());
+            }
+        });
         public RelayCommand AddCreatureInitiative => GetCommand(
             () =>
             {           

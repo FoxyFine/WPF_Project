@@ -188,25 +188,26 @@
                                                     <StackPanel>
                                                         <TextBlock Text="{Binding Name}" FontSize="22" MinWidth="100"/>
                                                         <StackPanel Orientation="Horizontal" Margin="10">
-                                                            <Slider x:Name="slValue" Maximum="{Binding Wounds}" Value="{Binding Wounds, Mode=OneTime}" IsSnapToTickEnabled="True" MinWidth="100" >
+                                                            <Slider x:Name="slValue" Maximum="{Binding Wounds}" Value="{Binding СurrentWounds, Mode=OneTime}" IsSnapToTickEnabled="True" MinWidth="100" >
                                                                 <Slider.ToolTip>
                                                                     <ToolTip Visibility="{Binding IsToolTipVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                                         <TextBlock Text="{Binding MinPlusSlider}"/>
                                                                     </ToolTip>
                                                                 </Slider.ToolTip>
+                                                                
                                                                 <i:Interaction.Triggers>
                                                                     
                                                                     <i:EventTrigger EventName="ValueChanged">
                                                                         <i:InvokeCommandAction Command="{Binding DataContext.SliderChangeInitiative, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
-                                                                                               CommandParameter="{Binding}" />
+                                                                                               CommandParameter="{Binding Value, ElementName=slValue}" />
                                                                         <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
                                                                     </i:EventTrigger>
-                                                                    
+
                                                                     <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                                                         <i:InvokeCommandAction Command="{Binding DataContext.ShowToolTipCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
                                                                         <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
                                                                     </i:EventTrigger>
-                                                                    
+
                                                                     <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
                                                                         <i:InvokeCommandAction Command="{Binding DataContext.HideToolTipCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
                                                                         <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
