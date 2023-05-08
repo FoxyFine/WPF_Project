@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -23,6 +25,19 @@ namespace WarhammerAGM
             db.BestiaryCreatures.Load();
             db.Characters.Load();
             db.Initiatives.Load();
+
+            ////var bc=  db.BestiaryCreatures.First();
+            ////var ch = db.Characters.First();
+
+            //db.BestiaryCreatures.Add(new BestiaryCreature() { Name = "123456" });
+            //db.Characters.Add(new Character() { Name = "qwerty" });
+            //db.SaveChanges();
+
+            //db.Initiatives.Add(new Initiative() { Name = "zxc", BestiaryCreature = db.BestiaryCreatures.First() });
+            //db.Initiatives.Add(new Initiative() { Name = "bnm", BestiaryCreature = db.Characters.First() });
+
+            //db.SaveChanges();
+
             EditableBC = new();
             EditableBCView = new();
             EditableC_CheckBox = new();
@@ -30,14 +45,55 @@ namespace WarhammerAGM
             EditableI = new();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
             Characters = db.Characters.Local.ToObservableCollection();
-            Initiatives = db.Initiatives.Local.ToObservableCollection();
+            Initiatives = db.Initiatives.Local.ToBindingList();
+            Initiatives.ListChanged += OnInitiativesChanged;
             IsToolTipVisible = false;
+        }
+
+        private void OnInitiativesChanged(object? sender, ListChangedEventArgs e)
+        {
+            if (e.ListChangedType == ListChangedType.ItemChanged)
+            {
+                db.SaveChanges();
+            }
+        }
+
+        private void AddCreatureInInitiatives(IEnumerable<BestiaryCreature> bestiaryCreatures)
+        {
+            foreach (BestiaryCreature bestiaryCreature in bestiaryCreatures)
+            {
+                Initiative? initiative = db.Initiatives.Local.FirstOrDefault(i => i.BestiaryCreatureId == bestiaryCreature.Id);
+                if (initiative is null)
+                {
+                    string name = bestiaryCreature.Name;
+                    if (bestiaryCreature is not Character)
+                        name += " #1";
+                    initiative = new() { BestiaryCreature = bestiaryCreature, Name = name, СurrentWounds = bestiaryCreature.Wounds };
+
+                }
+                else if (bestiaryCreature is not Character)
+                {
+                    string lastName = db.Initiatives.Local.Where(i => i.BestiaryCreatureId == bestiaryCreature.Id)
+                        .Select(i => i.Name).OrderBy(name => name).Last()!;
+                    var split = lastName.Split(" #");
+                    int num = int.Parse(split[1]) + 1;
+                    var name = bestiaryCreature.Name + " #" + num;
+                    initiative = new() { BestiaryCreature = bestiaryCreature, Name = name, СurrentWounds = bestiaryCreature.Wounds };
+                }
+                if (initiative is not null)
+                {
+
+                    db.Add(initiative);
+                }
+
+                db.SaveChanges();
+            }
         }
 
         private readonly ApplicationContext db = new ApplicationContext();
         public ObservableCollection<BestiaryCreature> BestiaryCreatures { get; }
         public ObservableCollection<Character> Characters { get; }
-        public ObservableCollection<Initiative> Initiatives { get; }
+        public BindingList<Initiative> Initiatives { get; }
         /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature EditableBC
         {
@@ -155,7 +211,7 @@ namespace WarhammerAGM
                     }
                 }
             }
-            if(propertyName == nameof(SelectedI)) 
+            if (propertyName == nameof(SelectedI))
             {
                 Initiative? @new = (Initiative?)newValue;
                 if (@new is null)
@@ -189,26 +245,11 @@ namespace WarhammerAGM
             },
             () => SelectedBC is BestiaryCreature);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        private bool _isToolTipVisible;
 
         public bool IsToolTipVisible
         {
-            get => _isToolTipVisible;
-            set
-            {
-                if (_isToolTipVisible != value)
-                {
-                    _isToolTipVisible = value;
-                    OnPropertyChanged(nameof(IsToolTipVisible));
-                }
-            }
-        }
-        
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            get => Get<bool>();
+            set => Set(value);
         }
         public RelayCommand ShowToolTipCommand => GetCommand(
             () =>
@@ -220,57 +261,35 @@ namespace WarhammerAGM
             {
                 IsToolTipVisible = false;
             });
-        public RelayCommand SliderChangeInitiative => GetCommand(
-        (double Value) =>
-        {
-            if (EditableI.СurrentWounds != (int)Value)
+        //public RelayCommand SliderChangeInitiative => GetCommand(
+        //(double Value) =>
+        //{
+        //    if (EditableI.СurrentWounds != (int)Value)
+        //    {
+        //        // Отключить механизм привязки данных временно
+        //        BindingOperations.DisableCollectionSynchronization(Initiatives);
+        //        lock (Initiatives)
+        //        {
+        //            EditableI.СurrentWounds = EditableI.Wounds - (EditableI.Wounds - (int)Value);
+        //            EditableI.MinPlusSlider = (int)Value - EditableI.Wounds;
+        //            int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
+        //            Initiatives[index] = EditableI;
+        //            db.SaveChanges();
+        //        }
+        //        // Включить механизм привязки данных снова
+        //        BindingOperations.EnableCollectionSynchronization(Initiatives, new object());
+        //    }
+        //});
+        public RelayCommand AddCreatureInitiative => GetCommand<IList>(
+            list =>
             {
-                // Отключить механизм привязки данных временно
-                BindingOperations.DisableCollectionSynchronization(Initiatives);
-                lock (Initiatives)
-                {
-                    EditableI.СurrentWounds = EditableI.Wounds - (EditableI.Wounds - (int)Value);
-                    EditableI.MinPlusSlider = (int)Value - EditableI.Wounds;
-                    int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
-                    Initiatives[index] = EditableI;
-                    db.SaveChanges();
-                }
-                // Включить механизм привязки данных снова
-                BindingOperations.EnableCollectionSynchronization(Initiatives, new object());
-            }
-        });
-        public RelayCommand AddCreatureInitiative => GetCommand(
-            () =>
-            {           
-                foreach (Character character in Characters)
-                {
-                    int k = 0;
-                    if (character.OnOfCharacter == true)
-                    {
-                        foreach (Initiative initiative in Initiatives) 
-                        {
-                            if (character.Name == initiative.Name)
-                            {
-                                k = 1;
-                                break;
-                            }
-                        }
-                        if (k == 1)
-                            continue;
-                        EditableI = new()
-                        {
-                            Name = character.Name,
-                            DexterityModifier = character.Dexterity / 10,
-                            Wounds = character.Wounds,
-                            Importancenitiative = 0,
-                            СurrentWounds = character.Wounds
-                        };
-                        Initiatives.Add(EditableI);
-                        db.SaveChanges();
-                    }
-                }
+                AddCreatureInInitiatives(list.OfType<Character>());
             });
-
+        public RelayCommand AddBestiaryInitiative => GetCommand<BestiaryCreature>(
+            bc =>
+            {
+                AddCreatureInInitiatives(new BestiaryCreature[] { bc });
+            });
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public RollCube RollCube
         {

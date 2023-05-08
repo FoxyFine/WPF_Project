@@ -32,7 +32,7 @@ namespace WarhammerAGM.Models
 
         public int? Partnership { get; set; }
 
-        public int? Wounds { get; set; }
+        public int Wounds { get; set; }
 
         public string? Speed { get; set; }
 
