@@ -28,7 +28,6 @@ namespace WarhammerAGM
             {
                 EditableC = new Character();
                 ModeC = ViewModeC.AddC;
-
             }
         );
         public RelayCommand CloneC => GetCommand
@@ -62,6 +61,13 @@ namespace WarhammerAGM
                     }
                     else
                     {
+                        string nametrim = EditableC.Name.Trim();
+                        if (nametrim == string.Empty || EditableC.Name == "")
+                        {
+                            EditableC.Name = "";
+                            MessageBox.Show("Введите корректное название");
+                            return;
+                        }
                         EntityEntry<Character> entry = db.Characters.Add(EditableC);
                         try
                         {
@@ -85,6 +91,13 @@ namespace WarhammerAGM
                     }
                     else
                     {
+                        string nametrim = EditableC.Name.Trim();
+                        if (nametrim == string.Empty || EditableC.Name == "")
+                        {
+                            EditableC.Name = "";
+                            MessageBox.Show("Введите корректное название");
+                            return;
+                        }
                         Character bestCrOld = Characters[index];
                         try
                         {
@@ -99,7 +112,8 @@ namespace WarhammerAGM
                         }
                     }
                 }
-                MessageBox.Show("Сохранение прошло успешно");
+                SelectedC = null;
+                MessageBox.Show("Сохранение прошло успешно");              
                 ModeC = ViewModeC.ViewC;
             }
         );

@@ -66,6 +66,13 @@ namespace WarhammerAGM
                     }
                     else
                     {
+                        string nametrim = EditableBC.Name.Trim();
+                        if (nametrim == string.Empty || EditableBC.Name == "")
+                        {
+                            EditableBC.Name = "";
+                            MessageBox.Show("Введите корректное название");
+                            return;
+                        }
                         EntityEntry<BestiaryCreature> entry = db.BestiaryCreatures.Add(EditableBC);
                         try
                         {
@@ -89,6 +96,13 @@ namespace WarhammerAGM
                     }
                     else
                     {
+                        string nametrim = EditableBC.Name.Trim();
+                        if (nametrim == string.Empty || EditableBC.Name == "")
+                        {
+                            EditableBC.Name = "";
+                            MessageBox.Show("Введите корректное название");
+                            return;
+                        }
                         BestiaryCreature bestCrOld = BestiaryCreatures[index];
                         try
                         {
@@ -103,6 +117,7 @@ namespace WarhammerAGM
                         }
                     }
                 }
+                SelectedBC = null;
                 MessageBox.Show("Сохранение прошло успешно");
                 Mode = ViewMode.View;
             }

@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Threading;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
@@ -24,76 +23,38 @@ namespace WarhammerAGM
             db.Database.EnsureCreated();
             db.BestiaryCreatures.Load();
             db.Characters.Load();
+            db.CreatureBases.Load();
+
             db.Initiatives.Load();
-
-            ////var bc=  db.BestiaryCreatures.First();
-            ////var ch = db.Characters.First();
-
-            //db.BestiaryCreatures.Add(new BestiaryCreature() { Name = "123456" });
-            //db.Characters.Add(new Character() { Name = "qwerty" });
-            //db.SaveChanges();
-
-            //db.Initiatives.Add(new Initiative() { Name = "zxc", BestiaryCreature = db.BestiaryCreatures.First() });
-            //db.Initiatives.Add(new Initiative() { Name = "bnm", BestiaryCreature = db.Characters.First() });
-
-            //db.SaveChanges();
+            db.TemporaryInitiatives.Load();
 
             EditableBC = new();
             EditableBCView = new();
             EditableC_CheckBox = new();
             EditableC = new();
-            EditableI = new();
+            //EditableI = new();
+            CreatureBases = db.CreatureBases.Local.ToObservableCollection();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
             Characters = db.Characters.Local.ToObservableCollection();
+
             Initiatives = db.Initiatives.Local.ToBindingList();
             Initiatives.ListChanged += OnInitiativesChanged;
-            IsToolTipVisible = false;
+
+            TemporaryInitiatives = db.TemporaryInitiatives.Local.ToBindingList();
+            TemporaryInitiatives.ListChanged += OnInitiativesChanged;
+
+            Round = Properties.Settings.Default.RoundSetting;
+            SliderValueChange = "0";
         }
-
-        private void OnInitiativesChanged(object? sender, ListChangedEventArgs e)
-        {
-            if (e.ListChangedType == ListChangedType.ItemChanged)
-            {
-                db.SaveChanges();
-            }
-        }
-
-        private void AddCreatureInInitiatives(IEnumerable<BestiaryCreature> bestiaryCreatures)
-        {
-            foreach (BestiaryCreature bestiaryCreature in bestiaryCreatures)
-            {
-                Initiative? initiative = db.Initiatives.Local.FirstOrDefault(i => i.BestiaryCreatureId == bestiaryCreature.Id);
-                if (initiative is null)
-                {
-                    string name = bestiaryCreature.Name;
-                    if (bestiaryCreature is not Character)
-                        name += " #1";
-                    initiative = new() { BestiaryCreature = bestiaryCreature, Name = name, СurrentWounds = bestiaryCreature.Wounds };
-
-                }
-                else if (bestiaryCreature is not Character)
-                {
-                    string lastName = db.Initiatives.Local.Where(i => i.BestiaryCreatureId == bestiaryCreature.Id)
-                        .Select(i => i.Name).OrderBy(name => name).Last()!;
-                    var split = lastName.Split(" #");
-                    int num = int.Parse(split[1]) + 1;
-                    var name = bestiaryCreature.Name + " #" + num;
-                    initiative = new() { BestiaryCreature = bestiaryCreature, Name = name, СurrentWounds = bestiaryCreature.Wounds };
-                }
-                if (initiative is not null)
-                {
-
-                    db.Add(initiative);
-                }
-
-                db.SaveChanges();
-            }
-        }
-
-        private readonly ApplicationContext db = new ApplicationContext();
+        private readonly ApplicationContext db = new();
+        public ObservableCollection<CreatureBase> CreatureBases { get; }
         public ObservableCollection<BestiaryCreature> BestiaryCreatures { get; }
         public ObservableCollection<Character> Characters { get; }
-        public BindingList<Initiative> Initiatives { get; }
+
+        public BindingList<Initiative> Initiatives { get; set; }
+        public BindingList<TemporaryInitiative> TemporaryInitiatives { get; }
+        private List<Initiative> OldListInitiative;
+        private List<TemporaryInitiative> OldListTemporary;
         /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature EditableBC
         {
@@ -245,50 +206,268 @@ namespace WarhammerAGM
             },
             () => SelectedBC is BestiaryCreature);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public bool IsToolTipVisible
+        public int Round
         {
-            get => Get<bool>();
-            set => Set(value);
+            get => Get<int>()!;
+            private set => Set(value);
         }
-        public RelayCommand ShowToolTipCommand => GetCommand(
-            () =>
+        private void OnInitiativesChanged(object? sender, ListChangedEventArgs e)
+        {
+            if (e.ListChangedType == ListChangedType.ItemChanged)
             {
-                IsToolTipVisible = true;
-            });
-        public RelayCommand HideToolTipCommand => GetCommand(
-            () =>
+                if (EditableI is not null)
+                {
+                    if (EditableI.Importancenitiative != Initiatives[e.NewIndex].Importancenitiative && EditableI is not null)
+                    {
+                        db.SaveChanges();
+                        SortInitiative();
+                    }
+                }
+                else
+                    db.SaveChanges();
+            }
+            if (e.ListChangedType == ListChangedType.Reset)
             {
-                IsToolTipVisible = false;
-            });
-        //public RelayCommand SliderChangeInitiative => GetCommand(
-        //(double Value) =>
-        //{
-        //    if (EditableI.СurrentWounds != (int)Value)
-        //    {
-        //        // Отключить механизм привязки данных временно
-        //        BindingOperations.DisableCollectionSynchronization(Initiatives);
-        //        lock (Initiatives)
-        //        {
-        //            EditableI.СurrentWounds = EditableI.Wounds - (EditableI.Wounds - (int)Value);
-        //            EditableI.MinPlusSlider = (int)Value - EditableI.Wounds;
-        //            int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
-        //            Initiatives[index] = EditableI;
-        //            db.SaveChanges();
-        //        }
-        //        // Включить механизм привязки данных снова
-        //        BindingOperations.EnableCollectionSynchronization(Initiatives, new object());
-        //    }
-        //});
+                db.SaveChanges();
+            }
+            if (e.ListChangedType == ListChangedType.ItemDeleted)
+            {
+                db.SaveChanges();
+            }
+            OldListInitiative = Initiatives.ToList();
+            OldListTemporary = TemporaryInitiatives.ToList();
+        }
+        public void SortInitiative()
+        {
+            if (Initiatives.Count > 1 && Initiatives.Count != 0)
+            {
+                List<Initiative> initiativeList = Initiatives.ToList();
+                initiativeList = initiativeList.OrderByDescending(item => item.Importancenitiative).ToList();
+                Initiatives.Clear();
+                foreach (Initiative initiative in initiativeList)
+                {
+                    Initiatives.Add(initiative);
+                }
+                db.SaveChanges();
+            }
+        }
+        public void SortTemporaryInitiative()
+        {
+            if (TemporaryInitiatives.Count > 1 && TemporaryInitiatives.Count != 0)
+            {
+                List<TemporaryInitiative> temporaryInitiativeList = TemporaryInitiatives.ToList();
+                temporaryInitiativeList = temporaryInitiativeList.OrderByDescending(item => item.Importancenitiative).ToList();
+                TemporaryInitiatives.Clear();
+                foreach (TemporaryInitiative temporaryinitiative in temporaryInitiativeList)
+                {
+                    TemporaryInitiatives.Add(temporaryinitiative);
+                }
+                db.SaveChanges();
+            }
+        }
+        private void AddCreatureInInitiatives(IEnumerable<CreatureBase> creatures)
+        {
+            foreach (CreatureBase creature in creatures)
+            {
+                Initiative? initiative = db.Initiatives.Local.FirstOrDefault(i => i.CreatureBaseId == creature.Id);
+                if (initiative is null)
+                {
+                    string name = creature.Name;
+                    if (creature is not Character)
+                        name += " #1";
+
+                    Random rnd = new();
+                    int dex_mod = 0;
+                    if (creature.Dexterity != 0)
+                        dex_mod = creature.Dexterity / 10;
+                    int initiative_num = rnd.Next(1, 10);
+
+                    initiative = new() { CreatureBase = creature, Name = name, Wounds = creature.Wounds, СurrentWounds = creature.Wounds, Importancenitiative = initiative_num + dex_mod, DexterityModifier = dex_mod, Type = creature.Discriminator };
+
+                    if (initiative is not null)
+                    {
+                        db.Add(initiative);
+                    }
+                }
+                else if (creature is not Character)
+                {
+                    string lastName = db.Initiatives.Local.Where(i => i.CreatureBaseId == creature.Id)
+                        .Select(i => i.Name).OrderBy(name => name).Last()!;
+                    var split = lastName.Split(" #");
+                    int num = int.Parse(split[1]) + 1;
+                    var name = creature.Name + " #" + num;
+
+                    Random rnd = new();
+                    int dex_mod = 0;
+                    if (creature.Dexterity != 0)
+                        dex_mod = creature.Dexterity / 10;
+                    int initiative_num = rnd.Next(1, 10);
+
+                    initiative = new() { CreatureBase = creature, Name = name, Wounds = creature.Wounds, СurrentWounds = creature.Wounds, Importancenitiative = initiative_num + dex_mod, DexterityModifier = dex_mod, Type = creature.Discriminator };
+                    if (initiative is not null)
+                    {
+                        db.Add(initiative);
+                    }
+                }
+            }
+            db.SaveChanges();
+            SortInitiative();
+        }
         public RelayCommand AddCreatureInitiative => GetCommand<IList>(
-            list =>
-            {
-                AddCreatureInInitiatives(list.OfType<Character>());
-            });
-        public RelayCommand AddBestiaryInitiative => GetCommand<BestiaryCreature>(
+             list =>
+             {
+                 AddCreatureInInitiatives(list.OfType<Character>());
+             });
+        public RelayCommand AddBestiaryInitiative => GetCommand<CreatureBase>(
             bc =>
             {
-                AddCreatureInInitiatives(new BestiaryCreature[] { bc });
+                AddCreatureInInitiatives(new CreatureBase[] { bc });
+            });
+        public RelayCommand NextStep => GetCommand(
+            () =>
+            {
+                Initiative? initiative = db.Initiatives.FirstOrDefault();
+                if (initiative != null)
+                {
+                    db.Initiatives.Remove(initiative);
+                    TemporaryInitiative? temporaryInitiative = new()
+                    {
+                        Id = initiative.Id,
+                        Name = initiative.Name,
+                        Type = initiative.Type,
+                        Wounds = initiative.Wounds,
+                        СurrentWounds = initiative.СurrentWounds,
+                        DexterityModifier = initiative.DexterityModifier,
+                        Importancenitiative = initiative.Importancenitiative,
+                        CreatureBaseId = initiative.CreatureBaseId,
+                        CreatureBase = initiative.CreatureBase
+                    };
+                    db.Add(temporaryInitiative);
+                    db.SaveChanges();
+                    SortTemporaryInitiative();
+                }
+                if (Initiatives.Count == 0 && TemporaryInitiatives.Count != 0)
+                {
+                    foreach (var item in TemporaryInitiatives)
+                    {
+                        Initiative? initiative1 = new()
+                        {
+                            Id = item.Id,
+                            Name = item.Name,
+                            Type = item.Type,
+                            Wounds = item.Wounds,
+                            СurrentWounds = item.СurrentWounds,
+                            DexterityModifier = item.DexterityModifier,
+                            Importancenitiative = item.Importancenitiative,
+                            CreatureBaseId = item.CreatureBaseId,
+                            CreatureBase = item.CreatureBase
+                        };
+                        db.Add(initiative1);
+                    }
+                    db.SaveChanges();
+                    SortInitiative();
+                    TemporaryInitiatives.Clear();
+
+                    Round++;
+                    Properties.Settings.Default.RoundSetting = Round;
+                    Properties.Settings.Default.Save();
+                }
+            });
+        public RelayCommand NextRound => GetCommand(
+        () =>
+        {
+            if (Initiatives.Count == 0)
+                return;
+            Round++;
+            Properties.Settings.Default.RoundSetting = Round;
+            Properties.Settings.Default.Save();
+            if (TemporaryInitiatives.Count != 0)
+            {
+                foreach (var item in TemporaryInitiatives)
+                {
+                    Initiative? initiative1 = new()
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Type = item.Type,
+                        Wounds = item.Wounds,
+                        СurrentWounds = item.СurrentWounds,
+                        DexterityModifier = item.DexterityModifier,
+                        Importancenitiative = item.Importancenitiative,
+                        CreatureBaseId = item.CreatureBaseId,
+                        CreatureBase = item.CreatureBase
+                    };
+                    db.Add(initiative1);
+                }
+                db.SaveChanges();
+                TemporaryInitiatives.Clear();
+                SortInitiative();
+            }
+        });
+        public RelayCommand RecalculateKInitiativeBestiary => GetCommand(
+        () =>
+        {
+            if (Initiatives.Count == 0) return;
+            List<Initiative> initiativeList = Initiatives.ToList();
+            Random rnd = new();
+            foreach (var item in initiativeList)
+            {
+                if (item.Type == "BestiaryCreature")
+                {
+                    int rndnum = rnd.Next(1, 10) + item.DexterityModifier;
+                    int index = Initiatives.TakeWhile(bc => bc.Id != item.Id).Count();
+                    Initiatives[index].Importancenitiative = rndnum;
+                    db.SaveChanges();
+                }
+            }
+        });
+        public RelayCommand DragCompletedSliderInitiative => GetCommand<Initiative>(
+        (value) =>
+        {
+            SliderValueChange = "0";
+        });
+        public string SliderValueChange
+        {
+            get => Get<string>()!;
+            private set => Set(value);
+        }
+        int OldСurrentWounds;
+        public RelayCommand DragStartedSliderInitiative => GetCommand<Initiative>(
+            (value) =>
+            {
+                OldСurrentWounds = value.СurrentWounds;
+            });
+        public RelayCommand DragDeltaSliderInitiative => GetCommand<Initiative>(
+        (value) =>
+        {
+            int changevalue = value.СurrentWounds - OldСurrentWounds;
+            if (changevalue > 0)
+            {
+                SliderValueChange = "+" + changevalue.ToString();
+            }
+            else
+                SliderValueChange = changevalue.ToString();
+
+        });
+        public double X
+        {
+            get => Get<double>()!;
+            private set => Set(value);
+        }
+        public double Y
+        {
+            get => Get<double>()!;
+            private set => Set(value);
+        }
+        public RelayCommand EndInitiative => GetCommand(
+            () =>
+            {
+                Initiatives.Clear();
+                TemporaryInitiatives.Clear();
+
+                Round = 0;
+                Properties.Settings.Default.RoundSetting = Round;
+                Properties.Settings.Default.Save();
             });
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         public RollCube RollCube

@@ -5,26 +5,18 @@ using ViewModels;
 
 namespace WarhammerAGM.Models
 {
-    public partial class Initiative : INotifyPropertyChanged
+    public partial class TemporaryInitiative : INotifyPropertyChanged
     {
         [Key]
         public int Id { get; set; }
         public string? Name { get; set; }
         public string? Type { get; set; }
         public int Wounds { get; set; }
-        public int _currentWounds;
-        public int СurrentWounds 
-        {
-            get { return _currentWounds; }
-            set
-            {
-                _currentWounds = value;
-                OnPropertyChanged("СurrentWounds");
-            }
-        }
+        public int СurrentWounds { get; set; }
         public int DexterityModifier { get; set; }
+
         public int _importancenitiative;
-        public int Importancenitiative
+        public int Importancenitiative 
         {
             get { return _importancenitiative; }
             set

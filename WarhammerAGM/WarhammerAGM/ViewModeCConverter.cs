@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
+using static WarhammerAGM.ApplicationViewModel;
 
 namespace WarhammerAGM
 {
@@ -11,8 +12,8 @@ namespace WarhammerAGM
         private bool not;
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var mode = (ApplicationViewModel.ViewModeC)value;
-            var view = mode == ApplicationViewModel.ViewModeC.ViewC;
+            var mode = (ViewModeC)value;
+            var view = mode == ViewModeC.ViewC;
             view ^= not; //view будет true если только одна из переменных true, остальное даст false
             if (targetType == typeof(Visibility))
                 return view ? Visibility.Visible : Visibility.Collapsed; //Collapsed - элемент не виден и не участвует в компоновке.
