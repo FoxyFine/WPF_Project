@@ -7,14 +7,18 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:WarhammerAGM" xmlns:models="clr-namespace:WarhammerAGM.Models" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="MainWindow" Height="540" Width="960"
+        Title="MainWindow" Height="670" Width="1090"
         FontSize="16"
-        DataContext="{DynamicResource vm}">
+        DataContext="{DynamicResource vm}"
+        Name="AGM">
 
     <Window.Resources>
         <local:ApplicationViewModel x:Key="vm"/>
         <local:DoubleConverter x:Key="DoubleConverter"/>
         <local:ValueProxy x:Key="Proxy"/>
+        <local:FlowDocumentConverter x:Key="FlowDocumentConverter" />
+        <local:VisibilityConverter x:Key="VisibilityConverter" />
+        <CollectionViewSource x:Key="bestiaryCreatureViewInitiative" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="bestiaryCreatureView" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="bestiaryCreatureEdit" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="characterView" Source="{Binding Characters}"/>
@@ -127,16 +131,23 @@
                                 <Thumb.Resources>
                                     <local:ValueProxy x:Key="Proxy" Value="{Binding ElementName=slValue}"/>
                                 </Thumb.Resources>
-
                                 <i:Interaction.Triggers>
+
+                                    <i:EventTrigger EventName="MouseMove">
+                                        <i:InvokeCommandAction Command="{Binding DataContext.PopupMove, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                                                               CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Thumb}}}" />
+                                    </i:EventTrigger>
+
                                     <i:EventTrigger EventName="DragCompleted">
                                         <i:InvokeCommandAction Command="{Binding DataContext.DragCompletedSliderInitiative, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
                                                                CommandParameter="{Binding}"/>
                                     </i:EventTrigger>
+
                                     <i:EventTrigger EventName="DragDelta">
                                         <i:InvokeCommandAction Command="{Binding DataContext.DragDeltaSliderInitiative, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" 
                                                                CommandParameter="{Binding}"/>
                                     </i:EventTrigger>
+
                                     <i:EventTrigger EventName="DragStarted">
                                         <i:InvokeCommandAction Command="{Binding DataContext.DragStartedSliderInitiative, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" 
                                                                CommandParameter="{Binding}"/>
@@ -146,10 +157,14 @@
                             </Thumb>
                         </Track.Thumb>
                     </Track>
-                    <Popup Placement="Bottom"
+                    <Popup x:Name="PopupSlider" Placement="Relative"
                            PlacementTarget="{Binding ElementName=Thumb}"
+                           AllowsTransparency="True"
+                           HorizontalOffset="{Binding DataContext.PositionX, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                           PopupAnimation="Scroll"
+                           VerticalOffset="-20"
                            IsOpen="{Binding IsDragging, ElementName=Thumb, Mode=OneWay}">
-                        <TextBlock Text="{Binding DataContext.SliderValueChange, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" FontSize="15"/>
+                        <TextBlock Text="{Binding DataContext.SliderValueChange, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" FontSize="15" Foreground="Black"/>
                     </Popup>
                 </Grid>
             </Border>
@@ -308,13 +323,12 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <DockPanel Grid.Column="0">
-                        <Slider Style="{DynamicResource SliderStyleForInitiative}"/>
                         <TextBox x:Name="SearchTextField0" DockPanel.Dock="Top" Margin="10"
                 Text="{Binding SearchTextBCView,
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
                             UpdateSourceTrigger=PropertyChanged}"/>
                         <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
-                                         SelectedItem="{Binding SelectedBC}"
+                                         SelectedItem="{Binding SelectedBCView}"
                                          IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -407,12 +421,29 @@
                                         </Border>
                                     </UniformGrid>
                                 </Border>
-                                <TextBlock Text="Навыки:" FontSize="24"/>
-                                <TextBlock Text="{Binding Skills}" FontSize="24"/>
-                                <TextBlock Text="Таланты:" FontSize="24"/>
-                                <TextBlock Text="{Binding Talents}" FontSize="24"/>
-                                <Expander Header="Описание" FontSize="24">
+                                <Expander Header="Описание" FontSize="24" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
                                     <TextBlock Text="{Binding Description}" FontSize="24"/>
+                                </Expander>
+                                <Expander Header="Умения" FontSize="24" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                    <TextBlock Text="{Binding Skills}" FontSize="24"/>
+                                </Expander>
+                                <Expander Header="Таланты" FontSize="24" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                    <TextBlock Text="{Binding Talents}" FontSize="24"/>
+                                </Expander>
+                                <Expander Header="Оружие" FontSize="24" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                    <TextBlock Text="{Binding Weapons}" FontSize="24"/>
+                                </Expander>
+                                <Expander Header="Броня" FontSize="24" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                    <TextBlock Text="{Binding Armor}" FontSize="24"/>
+                                </Expander>
+                                <Expander Header="Оборудование" FontSize="24" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                    <TextBlock Text="{Binding Equipment}" FontSize="24"/>
+                                </Expander>
+                                <Expander Header="Особенности" FontSize="24" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                    <TextBlock Text="{Binding Features}" FontSize="24"/>
+                                </Expander>
+                                <Expander Header="Дополнительные особенности" FontSize="24" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                    <TextBlock Text="{Binding AdditionalFeatures}" FontSize="24"/>
                                 </Expander>
                             </StackPanel>
                         </Grid>
@@ -422,17 +453,19 @@
             <TabItem Header="Инициатива">
                 <Grid Background="White">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <DockPanel Grid.Column="0">
+                    <DockPanel Grid.Column="0" MinWidth="300">
                         <TextBox x:Name="SearchTextField1" DockPanel.Dock="Top" Margin="10"
-                Text="{Binding SearchText,
+                                 Text="{Binding SearchTextBCViewInitiative,
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
                             UpdateSourceTrigger=PropertyChanged}"/>
-                        <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
-                                         SelectedItem="{Binding SelectedBC}">
+                        <ListBox x:Name="ListBoxInitiative" ItemsSource="{Binding Source={StaticResource bestiaryCreatureViewInitiative}}"
+                                         SelectedItem="{Binding SelectedBCViewInitiative}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
@@ -447,8 +480,8 @@
                     <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
 
                     <Grid Grid.Column="2">
-                        <TabControl>
-                            <TabItem Header="Инициатива">
+                        <TabControl MinWidth="400">
+                            <TabItem Header="Инициатива" FontSize="24">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -480,28 +513,21 @@
                                                     <DataTemplate>
                                                         <StackPanel Orientation="Vertical">
                                                             <StackPanel>
-                                                                <TextBlock Text="{Binding Name}" FontSize="22" MinWidth="100"/>
+                                                                <TextBlock Text="{Binding Name}" FontSize="18" MinWidth="100"/>
                                                                 <StackPanel Orientation="Horizontal" Margin="10">
                                                                     <Slider x:Name="slValue" Maximum="{Binding Wounds}" Value="{Binding СurrentWounds}" IsSnapToTickEnabled="True" MinWidth="150" Style="{StaticResource SliderStyleForInitiative}">
                                                                         <i:Interaction.Triggers>
-
                                                                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                                                                 <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
                                                                             </i:EventTrigger>
-
-                                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                                                                <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
-                                                                            </i:EventTrigger>
-
                                                                         </i:Interaction.Triggers>
                                                                     </Slider>
-                                                                    <TextBlock Text="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center"/>
+                                                                    <TextBlock Text="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" FontSize="18"/>
                                                                 </StackPanel>
                                                                 <StackPanel Orientation="Horizontal">
-                                                                    <TextBlock Text="Инициатива: "/>
-                                                                    <TextBox Text="{Binding Importancenitiative}" MaxLength="2">
+                                                                    <TextBlock Text="Инициатива: " FontSize="18"/>
+                                                                    <TextBox Text="{Binding Importancenitiative}" MaxLength="2" FontSize="18">
                                                                         <i:Interaction.Triggers>
-
                                                                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                                                                 <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
                                                                             </i:EventTrigger>
@@ -522,56 +548,39 @@
                                                     <DataTemplate>
                                                         <StackPanel Orientation="Vertical">
                                                             <StackPanel>
-                                                                <TextBlock Text="{Binding Name}" FontSize="22" MinWidth="100"/>
+                                                                <TextBlock Text="{Binding Name}" FontSize="18" MinWidth="100"/>
                                                                 <StackPanel Orientation="Horizontal" Margin="10">
                                                                     <Slider x:Name="slValue" Maximum="{Binding Wounds}" Value="{Binding СurrentWounds}" IsSnapToTickEnabled="True" MinWidth="100" >
-                                                                        <Slider.Resources>
-                                                                            <Style TargetType="Thumb">
-                                                                                <Setter Property="Background" Value="Aqua"/>
-                                                                            </Style>
-                                                                        </Slider.Resources>
-
                                                                         <i:Interaction.Triggers>
 
                                                                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                                                                <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
-                                                                            </i:EventTrigger>
-
-                                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
                                                                                 <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
                                                                             </i:EventTrigger>
 
                                                                         </i:Interaction.Triggers>
                                                                     </Slider>
-                                                                    <TextBlock Text="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center">
+                                                                    <TextBlock Text="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" FontSize="18"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="Инициатива: " FontSize="18"/>
+                                                                    <TextBox Text="{Binding Importancenitiative}" MaxLength="2" FontSize="18">
                                                                         <i:Interaction.Triggers>
-
                                                                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                                                                 <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
                                                                             </i:EventTrigger>
-
-                                                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                                                                <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
-                                                                            </i:EventTrigger>
-
                                                                         </i:Interaction.Triggers>
-                                                                    </TextBlock>
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal">
-                                                                    <TextBlock Text="Инициатива: "/>
-                                                                    <TextBox Text="{Binding Importancenitiative}" MaxLength="2"/>
+                                                                    </TextBox>
                                                                 </StackPanel>
                                                             </StackPanel>
                                                         </StackPanel>
                                                     </DataTemplate>
                                                 </ListBox.ItemTemplate>
                                             </ListBox>
-
                                         </Grid>
                                     </ScrollViewer>
                                 </Grid>
                             </TabItem>
-                            <TabItem Header="Персонажи">
+                            <TabItem Header="Персонажи" FontSize="24">
                                 <Grid Background="#FFE5E5E5">
                                     <ListBox x:Name="charactersLBox" ItemsSource="{Binding Characters}">
                                         <ListBox.ItemTemplate>
@@ -597,9 +606,125 @@
                                 </Grid>
                             </TabItem>
                         </TabControl>
-
                     </Grid>
-
+                    <GridSplitter Grid.Column="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+                    <StackPanel Grid.Column="4" Orientation="Vertical">
+                        <Button Visibility="{Binding SelectedItem, ElementName=ListBoxInitiative, Converter={StaticResource VisibilityConverter}}" Content="Убрать характеристики моба" FontSize="20" Command="{Binding SlectedBCViewInitiativeNull}"/>
+                        <Grid Visibility="{Binding SelectedItem, ElementName=ListBoxInitiative, Converter={StaticResource VisibilityConverter}}">
+                            <ScrollViewer Grid.Column="2">
+                                <Grid d:DataContext="{d:DesignInstance Type=models:Initiative}">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="DataContext" Value="{Binding EditableI}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}" Value="View">
+                                                    <Setter Property="DataContext" Value="{Binding SelectedI}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <StackPanel Orientation="Horizontal" Margin="5">
+                                                <TextBlock Text="Название: " FontSize="18"/>
+                                                <TextBlock Text="{Binding CreatureBase.Name}" FontSize="18"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="5">
+                                                <TextBlock Text="Раны: " FontSize="18"/>
+                                                <TextBlock Text="{Binding CreatureBase.Wounds}" FontSize="18"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="5">
+                                                <TextBlock Text="Скорость: " FontSize="18"/>
+                                                <TextBlock Text="{Binding CreatureBase.Speed}" FontSize="18"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                            <UniformGrid Margin="3" Columns="9" Rows="2" Background="Khaki">
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="0" Text="ББ" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="1" Text="Б" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="2" Text="Сил" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="3" Text="Вын" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="4" Text="Лов" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="5" Text="Инт" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="6" Text="Вос" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="7" Text="СВ" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Grid.Column="8" Text="Тов" Margin="3,0,3,0" FontSize="18" FontWeight="Bold"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Melee}" FontSize="18"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Ballistics}" FontSize="18"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Power}" FontSize="18"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Endurance}" FontSize="18"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Dexterity}" FontSize="18"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Intelligence}" FontSize="18"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Perception}" FontSize="18"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Willpower}" FontSize="18"/>
+                                                </Border>
+                                                <Border Background="GhostWhite" BorderBrush="Gainsboro" BorderThickness="1">
+                                                    <TextBlock Text="{Binding CreatureBase.Partnership}" FontSize="18"/>
+                                                </Border>
+                                            </UniformGrid>
+                                        </Border>
+                                        <Expander Header="Описание" FontSize="18" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                            <TextBlock Text="{Binding CreatureBase.Description}" FontSize="18"/>
+                                        </Expander>
+                                        <Expander Header="Умения" FontSize="18" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                            <TextBlock Text="{Binding CreatureBase.Skills}" FontSize="18"/>
+                                        </Expander>
+                                        <Expander Header="Таланты" FontSize="18" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                            <TextBlock Text="{Binding CreatureBase.Talents}" FontSize="18"/>
+                                        </Expander>
+                                        <Expander Header="Оружие" FontSize="18" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                            <TextBlock Text="{Binding CreatureBase.Weapons}" FontSize="18"/>
+                                        </Expander>
+                                        <Expander Header="Броня" FontSize="18" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                            <TextBlock Text="{Binding CreatureBase.Armor}" FontSize="18"/>
+                                        </Expander>
+                                        <Expander Header="Оборудование" FontSize="18" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                            <TextBlock Text="{Binding CreatureBase.Equipment}" FontSize="18"/>
+                                        </Expander>
+                                        <Expander Header="Особенности" FontSize="18" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                            <TextBlock Text="{Binding CreatureBase.Features}" FontSize="18"/>
+                                        </Expander>
+                                        <Expander Header="Дополнительные особенности" FontSize="18" Margin="5" Padding="3" BorderBrush="Black" BorderThickness="2">
+                                            <TextBlock Text="{Binding CreatureBase.AdditionalFeatures}" FontSize="18"/>
+                                        </Expander>
+                                    </StackPanel>
+                                </Grid>
+                            </ScrollViewer>
+                        </Grid>
+                    </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem Header="Инструменты">
@@ -1075,6 +1200,46 @@
                                     </Grid>
                                 </Grid>
                             </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="Заметки">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <ListBox ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFileName}" Grid.Column="0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" />
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <RichTextBox IsReadOnly="True" Grid.Column="1" />
+                                <!--<GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />-->
+                                <Grid Grid.Column="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="Сохранить" Command="{Binding SaveNotesCommand}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                        <Button Content="Жирный" Command="EditingCommands.ToggleBold" CommandTarget="{Binding ElementName=CreatingNotes}" />
+                                        <Button Content="Курсив" Command="EditingCommands.ToggleItalic" CommandTarget="{Binding ElementName=CreatingNotes}" />
+                                        <Button Content="Подчеркнутый" Command="EditingCommands.ToggleUnderline" CommandTarget="{Binding ElementName=CreatingNotes}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                        <TextBlock Text="Название заметки"/>
+                                        <TextBox Text="{Binding FileName}" MinWidth="200"/>
+                                    </StackPanel>
+                                    <RichTextBox x:Name="CreatingNotes" Grid.Row="3" TextChanged="CreatingNotesRichTextBox_TextChanged"/>
+                                </Grid>
+                            </Grid>
                         </TabItem>
                     </TabControl>
                 </Grid>

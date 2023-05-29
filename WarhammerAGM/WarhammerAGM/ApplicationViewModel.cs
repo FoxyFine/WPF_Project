@@ -5,18 +5,29 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Markup;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using static WarhammerAGM.ApplicationViewModel;
 
 namespace WarhammerAGM
 {
     public partial class ApplicationViewModel : ViewModelBase
     {
+        public ObservableCollection<string> FileNames { get; set; }
         public ApplicationViewModel()
         {
             /*В конструкторе класса загружаем данные из бд в локальный кэш*/
@@ -29,10 +40,11 @@ namespace WarhammerAGM
             db.TemporaryInitiatives.Load();
 
             EditableBC = new();
+            EditableBCViewInitiative = new();
             EditableBCView = new();
             EditableC_CheckBox = new();
             EditableC = new();
-            //EditableI = new();
+            EditableI = new();
             CreatureBases = db.CreatureBases.Local.ToObservableCollection();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
             Characters = db.Characters.Local.ToObservableCollection();
@@ -43,8 +55,11 @@ namespace WarhammerAGM
             TemporaryInitiatives = db.TemporaryInitiatives.Local.ToBindingList();
             TemporaryInitiatives.ListChanged += OnInitiativesChanged;
 
+            FileNames = new ObservableCollection<string>();
+
             Round = Properties.Settings.Default.RoundSetting;
             SliderValueChange = "0";
+            LoadFileNames();
         }
         private readonly ApplicationContext db = new();
         public ObservableCollection<CreatureBase> CreatureBases { get; }
@@ -53,10 +68,16 @@ namespace WarhammerAGM
 
         public BindingList<Initiative> Initiatives { get; set; }
         public BindingList<TemporaryInitiative> TemporaryInitiatives { get; }
-        private List<Initiative> OldListInitiative;
-        private List<TemporaryInitiative> OldListTemporary;
+
+        //private List<Initiative> OldListInitiative;
+        //private List<TemporaryInitiative> OldListTemporary;
         /// <summary>Сущность для региона детализации.</summary>
         public BestiaryCreature EditableBC
+        {
+            get => Get<BestiaryCreature>()!;
+            private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
+        }
+        public BestiaryCreature EditableBCViewInitiative
         {
             get => Get<BestiaryCreature>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
@@ -81,8 +102,18 @@ namespace WarhammerAGM
             get => Get<Initiative>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
         }
+        public BestiaryCreature EditableBCViewInitiativeStats
+        {
+            get => Get<BestiaryCreature>()!;
+            private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
+        }
         /// <summary>Выбранная сущность.</summary>
         public BestiaryCreature? SelectedBC
+        {
+            get => Get<BestiaryCreature?>();
+            set => Set(value);
+        }
+        public BestiaryCreature? SelectedBCViewInitiative
         {
             get => Get<BestiaryCreature?>();
             set => Set(value);
@@ -119,6 +150,14 @@ namespace WarhammerAGM
                     EditableBC = new();
                 else
                     EditableBC = db.BestiaryCreatures.AsNoTracking().First(bc => bc.Id == @new.Id); //Чтобы данные не помещались в кэш, применяется метод AsNoTracking()
+            }
+            if (propertyName == nameof(SelectedBCViewInitiative))
+            {
+                BestiaryCreature? @new = (BestiaryCreature?)newValue;
+                if (@new is null)
+                    EditableBCViewInitiative = new();
+                else
+                    EditableBCViewInitiative = db.BestiaryCreatures.AsNoTracking().First(bc => bc.Id == @new.Id);
             }
             if (propertyName == nameof(SelectedBCView))
             {
@@ -182,6 +221,9 @@ namespace WarhammerAGM
                 }
                 else
                     EditableI = db.Initiatives.AsNoTracking().First(bc => bc.Id == @new.Id);
+                //int index = BestiaryCreatures.TakeWhile(bc => bc.Id != EditableI.CreatureBaseId).Count();
+                //EditableI.CreatureBase.Ballistics = 10;
+                //EditableBCViewInitiativeStats = BestiaryCreatures[EditableI.Id];
             }
         }
         /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
@@ -217,7 +259,7 @@ namespace WarhammerAGM
             {
                 if (EditableI is not null)
                 {
-                    if (EditableI.Importancenitiative != Initiatives[e.NewIndex].Importancenitiative && EditableI is not null)
+                    if (EditableI.Importancenitiative != Initiatives[e.NewIndex].Importancenitiative)
                     {
                         db.SaveChanges();
                         SortInitiative();
@@ -230,12 +272,8 @@ namespace WarhammerAGM
             {
                 db.SaveChanges();
             }
-            if (e.ListChangedType == ListChangedType.ItemDeleted)
-            {
-                db.SaveChanges();
-            }
-            OldListInitiative = Initiatives.ToList();
-            OldListTemporary = TemporaryInitiatives.ToList();
+            //OldListInitiative = Initiatives.ToList();
+            //OldListTemporary = TemporaryInitiatives.ToList();
         }
         public void SortInitiative()
         {
@@ -330,6 +368,7 @@ namespace WarhammerAGM
                 if (initiative != null)
                 {
                     db.Initiatives.Remove(initiative);
+                    db.SaveChanges();
                     TemporaryInitiative? temporaryInitiative = new()
                     {
                         Id = initiative.Id,
@@ -421,6 +460,74 @@ namespace WarhammerAGM
                 }
             }
         });
+        public double PositionX
+        {
+            get => Get<double>()!;
+            private set => Set(value);
+        }
+        public RelayCommand PopupMove => GetCommand(
+        (parametr) =>
+        {
+            if (parametr is not null)
+            {
+                Thumb thumb = (Thumb)parametr;
+                if (thumb.IsDragging)
+                {
+                    var position = Mouse.GetPosition(thumb);
+                    PositionX = position.X;
+                    UpdatePopupHorizontalOffset();
+                }
+            }
+        });
+        //private void UpdatePopupHorizontalOffset()
+        //{
+        //    Application.Current.Dispatcher.Invoke(() =>
+        //    {
+        //        // Обновление значения HorizontalOffset в UI-потоке
+        //        var popup = FindVisualChild<Popup>(Application.Current.MainWindow); // Найдите Popup по имени или другим способом
+        //        if (popup != null)
+        //        {
+        //            popup.HorizontalOffset = PositionX;
+        //        }
+        //    });
+        //}
+        private void UpdatePopupHorizontalOffset()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var popup = FindVisualChild<Popup>(Application.Current.MainWindow);
+                if (popup != null)
+                {
+                    double targetOffset = PositionX;
+
+                    DoubleAnimation animation = new()
+                    {
+                        To = targetOffset,
+                        Duration = TimeSpan.FromSeconds(0.0001), // Продолжительность анимации (в данном случае 0.1 секунды)
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut } // Функция сглаживания для плавности анимации
+                    };
+
+                    popup.BeginAnimation(Popup.HorizontalOffsetProperty, animation);
+                }
+            });
+        }
+        public static T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+                {
+                    var child = VisualTreeHelper.GetChild(parent, i);
+                    if (child is Popup popup && popup.Name == "PopupSlider" && child is T typedChild)
+                        return typedChild;
+
+                    var foundChild = FindVisualChild<T>(child);
+                    if (foundChild != null)
+                        return foundChild;
+                }
+            }
+            return null;
+        }
         public RelayCommand DragCompletedSliderInitiative => GetCommand<Initiative>(
         (value) =>
         {
@@ -449,16 +556,6 @@ namespace WarhammerAGM
                 SliderValueChange = changevalue.ToString();
 
         });
-        public double X
-        {
-            get => Get<double>()!;
-            private set => Set(value);
-        }
-        public double Y
-        {
-            get => Get<double>()!;
-            private set => Set(value);
-        }
         public RelayCommand EndInitiative => GetCommand(
             () =>
             {
@@ -469,11 +566,26 @@ namespace WarhammerAGM
                 Properties.Settings.Default.RoundSetting = Round;
                 Properties.Settings.Default.Save();
             });
+        public RelayCommand SlectedBCViewInitiativeNull => GetCommand(
+            () =>
+            {
+                SelectedBCViewInitiative = null;
+            });
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        private RollCube _rollcube = new();
         public RollCube RollCube
         {
-            get => Get<RollCube>()!;
-            private set => Set(value);
+            get => _rollcube;
+            private set
+            {
+                _rollcube = value;
+                OnPropertyChanged("RollCube");
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
         public ObservableCollection<ListCube> ListCubeCollection { get; } = new();
         public RelayCommand Roll => GetCommand(() =>
@@ -509,6 +621,85 @@ namespace WarhammerAGM
         public RelayCommand ClearHistory => GetCommand(() =>
         {
             ListCubeCollection.Clear();
+        });
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public string RichTextXaml
+        {
+            get => Get<string>()!;
+            set => Set(value);
+        }
+        public string FileName
+        {
+            get => Get<string>()!;
+            set => Set(value);
+        }
+        public string FileContentXaml
+        {
+            get => Get<string>()!;
+            set => Set(value);
+        }
+        private string selectedFileName;
+        public string SelectedFileName
+        {
+            get { return selectedFileName; }
+            set
+            {
+                selectedFileName = value;
+                OnPropertyChanged(nameof(SelectedFileName));
+                LoadFileContent();
+            }
+        }
+        private void LoadFileContent()
+        {
+            string appFolderPath = AppDomain.CurrentDomain.BaseDirectory;
+            string notesFolderPath = Path.Combine(appFolderPath, "Notes");
+            string filePath = Path.Combine(notesFolderPath, SelectedFileName + ".xaml");
+
+            if (File.Exists(filePath))
+            {
+                FileContentXaml = File.ReadAllText(filePath);
+            }
+            else
+            {
+                FileContentXaml = string.Empty;
+            }
+        }
+        public void LoadFileNames()
+        {
+            string appFolderPath = AppDomain.CurrentDomain.BaseDirectory; // Получаем путь к основной папке приложения
+            string notesFolderPath = Path.Combine(appFolderPath, "Notes"); // Объединяем путь с подпапкой "Notes"
+
+            if (!Directory.Exists(notesFolderPath))
+            {
+                // Если папка не существует, выходим из метода
+                return;
+            }
+
+            // Получаем список файлов в папке "Notes"
+            string[] files = Directory.GetFiles(notesFolderPath, "*.xaml");
+            if (files.Length == 0)
+                return;
+            foreach (string file in files)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(file);
+                FileNames.Add(fileName);
+            }
+        }
+        public RelayCommand SaveNotesCommand => GetCommand(() =>
+        {
+            string appFolderPath = AppDomain.CurrentDomain.BaseDirectory; // Получаем путь к основной папке приложения
+            string notesFolderPath = Path.Combine(appFolderPath, "Notes"); // Объединяем путь с подпапкой "Notes"
+
+            // Создаем уникальное имя файла на основе текущей даты и времени
+            if (string.IsNullOrWhiteSpace(FileName))
+            {
+                MessageBox.Show("Введите название заметки(оно не должно быть пустым или состоять только из проблелов");
+                return;
+            }
+            string filePath = Path.Combine(notesFolderPath, FileName + ".xaml");
+
+            File.WriteAllText(filePath, RichTextXaml);
+            RichTextXaml = string.Empty;
         });
     }
 }
