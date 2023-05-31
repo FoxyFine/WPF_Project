@@ -1,27 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Common;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using ViewModels;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.WarhammerAGM.Models;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using static WarhammerAGM.ApplicationViewModel;
 
 namespace WarhammerAGM
 {
@@ -623,23 +616,24 @@ namespace WarhammerAGM
             ListCubeCollection.Clear();
         });
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        public string RichTextXaml
+        public string? FileName
         {
             get => Get<string>()!;
             set => Set(value);
         }
-        public string FileName
+        private string selectedFileNameView;
+        public string SelectedFileNameView
         {
-            get => Get<string>()!;
-            set => Set(value);
-        }
-        public string FileContentXaml
-        {
-            get => Get<string>()!;
-            set => Set(value);
+            get { return selectedFileNameView; }
+            set
+            {
+                selectedFileNameView = value;
+                OnPropertyChanged(nameof(SelectedFileNameView));
+                LoadFileContentView();
+            }
         }
         private string selectedFileName;
-        public string SelectedFileName
+        public string? SelectedFileName
         {
             get { return selectedFileName; }
             set
@@ -649,6 +643,16 @@ namespace WarhammerAGM
                 LoadFileContent();
             }
         }
+        public string? RichTextDocument
+        {
+            get => Get<string>()!;
+            set => Set(value);
+        }
+        public string? NoteContent
+        {
+            get => Get<string>()!;
+            set => Set(value);
+        }
         private void LoadFileContent()
         {
             string appFolderPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -657,18 +661,65 @@ namespace WarhammerAGM
 
             if (File.Exists(filePath))
             {
-                FileContentXaml = File.ReadAllText(filePath);
+                RichTextDocument = File.ReadAllText(filePath);
+                FileName = SelectedFileName;
             }
             else
             {
-                FileContentXaml = string.Empty;
+                RichTextDocument = null;
             }
         }
+        private void LoadFileContentView()
+        {
+            string appFolderPath = AppDomain.CurrentDomain.BaseDirectory;
+            string notesFolderPath = Path.Combine(appFolderPath, "Notes");
+            string filePath = Path.Combine(notesFolderPath, SelectedFileNameView + ".xaml");
+
+            if (File.Exists(filePath))
+            {
+                NoteContent = File.ReadAllText(filePath);
+            }
+            else
+            {
+                NoteContent = null;
+            }
+        }
+        public RelayCommand SaveNotesCommand => GetCommand(() =>
+        {
+            string appFolderPath = AppDomain.CurrentDomain.BaseDirectory; // Получаем путь к основной папке приложения
+            string notesFolderPath = Path.Combine(appFolderPath, "Notes"); // Объединяем путь с подпапкой "Notes"
+            // Создаем уникальное имя файла на основе текущей даты и времени
+            if (string.IsNullOrWhiteSpace(FileName))
+            {
+                MessageBox.Show("Введите название заметки(оно не должно быть пустым или состоять только из проблелов");
+                return;
+            }
+            string filePath = Path.Combine(notesFolderPath, FileName + ".xaml");
+            if (File.Exists(filePath))
+            {
+                MessageBoxResult result = MessageBox.Show("Файл с таким именем уже существует. Хотите заменить его?", "Подтверждение замены файла", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.No)
+                {
+                    return;
+                }
+                else if (result == MessageBoxResult.Yes)
+                {
+                    string? buf = RichTextDocument;
+                    File.Delete(filePath); // Удаление старого файла
+                    FileNames.Remove(FileName);
+                    RichTextDocument = buf;
+                }
+            }
+                File.WriteAllText(filePath, RichTextDocument);
+                FileNames.Add(FileName);
+                RichTextDocument = null;
+                FileName = null;
+        });
         public void LoadFileNames()
         {
             string appFolderPath = AppDomain.CurrentDomain.BaseDirectory; // Получаем путь к основной папке приложения
             string notesFolderPath = Path.Combine(appFolderPath, "Notes"); // Объединяем путь с подпапкой "Notes"
-
+            FileNames.Clear();
             if (!Directory.Exists(notesFolderPath))
             {
                 // Если папка не существует, выходим из метода
@@ -685,21 +736,14 @@ namespace WarhammerAGM
                 FileNames.Add(fileName);
             }
         }
-        public RelayCommand SaveNotesCommand => GetCommand(() =>
-        {
-            string appFolderPath = AppDomain.CurrentDomain.BaseDirectory; // Получаем путь к основной папке приложения
-            string notesFolderPath = Path.Combine(appFolderPath, "Notes"); // Объединяем путь с подпапкой "Notes"
-
-            // Создаем уникальное имя файла на основе текущей даты и времени
-            if (string.IsNullOrWhiteSpace(FileName))
+        public RelayCommand DeleteContentNotes => GetCommand(
+            () =>
             {
-                MessageBox.Show("Введите название заметки(оно не должно быть пустым или состоять только из проблелов");
-                return;
-            }
-            string filePath = Path.Combine(notesFolderPath, FileName + ".xaml");
+                SelectedFileName = null;
+                RichTextDocument = null;
+                FileName = null;
+            });
 
-            File.WriteAllText(filePath, RichTextXaml);
-            RichTextXaml = string.Empty;
-        });
     }
+
 }

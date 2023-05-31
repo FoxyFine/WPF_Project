@@ -16,7 +16,6 @@
         <local:ApplicationViewModel x:Key="vm"/>
         <local:DoubleConverter x:Key="DoubleConverter"/>
         <local:ValueProxy x:Key="Proxy"/>
-        <local:FlowDocumentConverter x:Key="FlowDocumentConverter" />
         <local:VisibilityConverter x:Key="VisibilityConverter" />
         <CollectionViewSource x:Key="bestiaryCreatureViewInitiative" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="bestiaryCreatureView" Source="{Binding BestiaryCreatures}"/>
@@ -315,7 +314,7 @@
 
     <Grid>
         <TabControl FontSize="36" SelectedIndex="1">
-            <TabItem Header="Бестиарий">
+            <TabItem Header="Бестиарий" FontFamily="pack://application:,,,/fonts/#Vinque Rg">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -450,7 +449,7 @@
                     </ScrollViewer>
                 </Grid>
             </TabItem>
-            <TabItem Header="Инициатива">
+            <TabItem Header="Инициатива" FontFamily="pack://application:,,,/fonts/#Vinque Rg">
                 <Grid Background="White">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -464,7 +463,7 @@
                                  Text="{Binding SearchTextBCViewInitiative,
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
                             UpdateSourceTrigger=PropertyChanged}"/>
-                        <ListBox x:Name="ListBoxInitiative" ItemsSource="{Binding Source={StaticResource bestiaryCreatureViewInitiative}}"
+                        <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureViewInitiative}}"
                                          SelectedItem="{Binding SelectedBCViewInitiative}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -495,6 +494,9 @@
                                         <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Добавить игроков в инициативу"
                                                 Command="{Binding AddCreatureInitiative}"
                                                 CommandParameter="{Binding SelectedItems, ElementName=charactersLBox}">
+                                            <Button.Background>
+                                                <ImageBrush/>
+                                            </Button.Background>
                                             <Image Source = "/icons8-мужчина-стоит-50.png"/>
                                         </Button>
                                         <Button Content="X" MinHeight="50" MinWidth="50" Margin="12,0,3,0" ToolTip="Очистить поле и окончить бой" Command="{Binding EndInitiative}"/>
@@ -505,7 +507,7 @@
                                                 <RowDefinition Height="*"/>
                                                 <RowDefinition Height="*"/>
                                             </Grid.RowDefinitions>
-                                            <ListBox Grid.Row="0" ItemsSource="{Binding Initiatives, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectedItem="{Binding SelectedI}">
+                                            <ListBox x:Name="InitiativeListBox" Grid.Row="0" ItemsSource="{Binding Initiatives, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectedItem="{Binding SelectedI}">
                                                 <i:Interaction.Behaviors>
                                                     <AttachedBehaviors:IgnoreMouseWheelBehavior />
                                                 </i:Interaction.Behaviors>
@@ -609,8 +611,8 @@
                     </Grid>
                     <GridSplitter Grid.Column="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
                     <StackPanel Grid.Column="4" Orientation="Vertical">
-                        <Button Visibility="{Binding SelectedItem, ElementName=ListBoxInitiative, Converter={StaticResource VisibilityConverter}}" Content="Убрать характеристики моба" FontSize="20" Command="{Binding SlectedBCViewInitiativeNull}"/>
-                        <Grid Visibility="{Binding SelectedItem, ElementName=ListBoxInitiative, Converter={StaticResource VisibilityConverter}}">
+                        <Button Visibility="{Binding SelectedItem, ElementName=InitiativeListBox, Converter={StaticResource VisibilityConverter}}" Content="Убрать характеристики моба" FontSize="20" Command="{Binding SlectedBCViewInitiativeNull}"/>
+                        <Grid Visibility="{Binding SelectedItem, ElementName=InitiativeListBox, Converter={StaticResource VisibilityConverter}}">
                             <ScrollViewer Grid.Column="2">
                                 <Grid d:DataContext="{d:DesignInstance Type=models:Initiative}">
                                     <Grid.Style>
@@ -727,7 +729,7 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Инструменты">
+            <TabItem Header="Инструменты" FontFamily="pack://application:,,,/fonts/#Vinque Rg">
                 <Grid Background="#FFE5E5E5">
                     <TabControl FontSize="22">
                         <TabItem Header="Бестиарий">
@@ -1205,20 +1207,18 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <ListBox ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFileName}" Grid.Column="0">
+                                <ListBox ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFileName}" Grid.Column="0" MinWidth="200">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding}" />
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
-                                <RichTextBox IsReadOnly="True" Grid.Column="1" />
-                                <!--<GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />-->
-                                <Grid Grid.Column="3">
+                                <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+                                <Grid Grid.Column="2">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
@@ -1226,22 +1226,46 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
                                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Button Content="Сохранить" Command="{Binding SaveNotesCommand}"/>
+                                        <Button Content="Очистить заметки" Command="{Binding DeleteContentNotes}" Margin="5"/>
+                                        <Button Content="Сохранить" Command="{Binding SaveNotesCommand}" Margin="5"/>
                                     </StackPanel>
                                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                        <Button Content="Жирный" Command="EditingCommands.ToggleBold" CommandTarget="{Binding ElementName=CreatingNotes}" />
-                                        <Button Content="Курсив" Command="EditingCommands.ToggleItalic" CommandTarget="{Binding ElementName=CreatingNotes}" />
-                                        <Button Content="Подчеркнутый" Command="EditingCommands.ToggleUnderline" CommandTarget="{Binding ElementName=CreatingNotes}" />
+                                        <Button Command="EditingCommands.ToggleBold" CommandTarget="{Binding ElementName=CreatingNotes}" >
+                                            <Image Source="/Images/free-icon-bold-235524.png" Width="20"/>
+                                        </Button>
+                                        <Button Command="EditingCommands.ToggleItalic" CommandTarget="{Binding ElementName=CreatingNotes}">
+                                            <Image Source="/Images/free-icon-italic-142351.png" Width="20"/>
+                                        </Button>
+                                        <Button Command="EditingCommands.ToggleUnderline" CommandTarget="{Binding ElementName=CreatingNotes}">
+                                            <Image Source="/Images/free-icon-underline-text-option-25433.png" Width="20"/>
+                                        </Button>
+
                                     </StackPanel>
                                     <StackPanel Grid.Row="2" Orientation="Horizontal">
                                         <TextBlock Text="Название заметки"/>
                                         <TextBox Text="{Binding FileName}" MinWidth="200"/>
                                     </StackPanel>
-                                    <RichTextBox x:Name="CreatingNotes" Grid.Row="3" TextChanged="CreatingNotesRichTextBox_TextChanged"/>
+                                    <RichTextBox x:Name="CreatingNotes" Grid.Row="3" local:RichTextBoxHelper.DocumentXaml="{Binding RichTextDocument, Mode=TwoWay}"/>
                                 </Grid>
                             </Grid>
                         </TabItem>
                     </TabControl>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Заметки" FontFamily="pack://application:,,,/fonts/#Vinque Rg">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox ItemsSource="{Binding FileNames}" SelectedItem="{Binding SelectedFileNameView}" Grid.Column="0" MinWidth="200">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <RichTextBox Grid.Column="1" local:RichTextBoxHelper.DocumentXaml="{Binding NoteContent, Mode=TwoWay}" IsReadOnly="True"/>
                 </Grid>
             </TabItem>
         </TabControl>

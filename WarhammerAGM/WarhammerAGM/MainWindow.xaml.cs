@@ -1,17 +1,12 @@
 ﻿using System;
-using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Markup;
 using WarhammerAGM.Models;
 
 namespace WarhammerAGM
 {
     public partial class MainWindow : Window
     {
-        private ApplicationViewModel viewModel;
         private readonly CollectionViewSource bestiaryCreatureViewInitiative;
         private readonly CollectionViewSource bestiaryCreatureView;
         private readonly CollectionViewSource bestiaryCreatureEdit;
@@ -23,9 +18,6 @@ namespace WarhammerAGM
             bestiaryCreatureView = (CollectionViewSource)Resources[nameof(bestiaryCreatureView)];
             bestiaryCreatureEdit = (CollectionViewSource)Resources[nameof(bestiaryCreatureEdit)];
             characterView = (CollectionViewSource)Resources[nameof(characterView)];
-
-            viewModel = new ApplicationViewModel();
-            DataContext = viewModel;
         }
 
         private string inputText = string.Empty;
@@ -142,13 +134,6 @@ namespace WarhammerAGM
             };
 
             characterView.Filter += filter;
-        }
-
-        private void CreatingNotesRichTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            var richTextBox = (RichTextBox)sender;
-            var textRange = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
-            viewModel.RichTextXaml = textRange.Text;
-        }
+        } 
     }
 }
