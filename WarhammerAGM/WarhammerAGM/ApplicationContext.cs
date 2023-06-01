@@ -12,6 +12,8 @@ namespace WarhammerAGM
 
         public DbSet<Initiative> Initiatives { get; set; } = null!;
         public DbSet<TemporaryInitiative> TemporaryInitiatives { get; set; } = null!;
+
+        public DbSet<DeathListInitiative> DeathListInitiatives { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) //Чтобы задать файл данных SQLite, в этом примере используется переопределение OnConfiguring.
         {
             optionsBuilder.UseSqlite("Data Source=AGM.db");

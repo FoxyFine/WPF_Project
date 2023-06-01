@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 using WarhammerAGM.Models;
+using Xceed.Wpf.Toolkit;
 
 namespace WarhammerAGM
 {
     public partial class MainWindow : Window
     {
+        private ApplicationViewModel viewModel;
         private readonly CollectionViewSource bestiaryCreatureViewInitiative;
         private readonly CollectionViewSource bestiaryCreatureView;
         private readonly CollectionViewSource bestiaryCreatureEdit;
@@ -18,6 +24,9 @@ namespace WarhammerAGM
             bestiaryCreatureView = (CollectionViewSource)Resources[nameof(bestiaryCreatureView)];
             bestiaryCreatureEdit = (CollectionViewSource)Resources[nameof(bestiaryCreatureEdit)];
             characterView = (CollectionViewSource)Resources[nameof(characterView)];
+
+            viewModel = new ApplicationViewModel();
+            DataContext = viewModel;
         }
 
         private string inputText = string.Empty;
@@ -134,6 +143,33 @@ namespace WarhammerAGM
             };
 
             characterView.Filter += filter;
-        } 
+        }
+
+        private void TextColorChange(object sender, RoutedEventArgs e)
+        {
+
+            TextRange selectedText = new TextRange(CreatingNotes.Selection.Start, CreatingNotes.Selection.End);
+            if (!selectedText.IsEmpty)
+            {
+                Brush colorBrush = new SolidColorBrush(viewModel.ColorPick);
+                // Применить кисть к свойству Foreground выделенного текста
+                selectedText.ApplyPropertyValue(TextElement.ForegroundProperty, colorBrush);
+
+            }
+
+        }
+        private void BacgroundColorChange(object sender, RoutedEventArgs e)
+        {
+
+            TextRange selectedText = new TextRange(CreatingNotes.Selection.Start, CreatingNotes.Selection.End);
+            if (!selectedText.IsEmpty)
+            {
+                Brush colorBrush = new SolidColorBrush(viewModel.ColorPick);
+                // Применить кисть к свойству Foreground выделенного текста
+                selectedText.ApplyPropertyValue(TextElement.BackgroundProperty, colorBrush);
+
+            }
+
+        }
     }
 }

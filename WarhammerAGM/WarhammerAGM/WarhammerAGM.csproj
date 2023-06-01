@@ -16,7 +16,17 @@
 
   <ItemGroup>
     <None Remove="Fonts\ofont.ru_Vinque Rg.ttf" />
-    <None Remove="icons8-мужчина-стоит-50.png" />
+    <None Remove="Images\free-icon-align-center-1994232.png" />
+    <None Remove="Images\free-icon-align-left-4355223.png" />
+    <None Remove="Images\free-icon-align-right-4355227.png" />
+    <None Remove="Images\free-icon-bold-235524.png" />
+    <None Remove="Images\free-icon-indent-7560642.png" />
+    <None Remove="Images\free-icon-indent-7560643.png" />
+    <None Remove="Images\free-icon-italic-142351.png" />
+    <None Remove="Images\free-icon-numbering-2407849.png" />
+    <None Remove="Images\free-icon-pen-4409298.png" />
+    <None Remove="Images\free-icon-underline-text-option-25433.png" />
+    <None Remove="Images\icons8-мужчина-стоит-50.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,7 +40,39 @@
     <Resource Include="Fonts\ofont.ru_Vinque Rg.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="icons8-мужчина-стоит-50.png" />
+    <Resource Include="Images\free-icon-align-center-1994232.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-align-left-4355223.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-align-right-4355227.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-bold-235524.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-indent-7560642.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-indent-7560643.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-italic-142351.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-numbering-2407849.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-pen-4409298.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\free-icon-underline-text-option-25433.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\icons8-мужчина-стоит-50.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

@@ -17,6 +17,7 @@
         <local:DoubleConverter x:Key="DoubleConverter"/>
         <local:ValueProxy x:Key="Proxy"/>
         <local:VisibilityConverter x:Key="VisibilityConverter" />
+        <local:ColorToBrushConverter x:Key="ColorToBrushConverter" />
         <CollectionViewSource x:Key="bestiaryCreatureViewInitiative" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="bestiaryCreatureView" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="bestiaryCreatureEdit" Source="{Binding BestiaryCreatures}"/>
@@ -484,24 +485,43 @@
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
                                     <StackPanel Orientation="Horizontal" Grid.Row="0">
                                         <TextBlock Text="{Binding Round}" Margin="3,0,3,0" ToolTip="Прошло раундов"/>
-                                        <Button Content="->" MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Следующий ход" Command="{Binding NextStep}"/>
-                                        <Button Content="->>" MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Завершение раунда и начало нового" Command="{Binding NextRound}"/>
-                                        <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Пересчитать инициативу мобов" Command="{Binding RecalculateKInitiativeBestiary}"/>
-                                        <Button MinHeight="50" MinWidth="50" Margin="3,0,3,0" ToolTip="Добавить игроков в инициативу"
+                                        <Button Content="->" MinHeight="30" MinWidth="30" Margin="3,0,3,0" ToolTip="Следующий ход" Command="{Binding NextStep}"/>
+                                        <Button Content="->>" MinHeight="30" MinWidth="30" Margin="3,0,3,0" ToolTip="Завершение раунда и начало нового" Command="{Binding NextRound}"/>
+                                        <Button MinHeight="30" MinWidth="30" Margin="3,0,3,0" ToolTip="Пересчитать инициативу мобов" Command="{Binding RecalculateKInitiativeBestiary}"/>
+                                        <Button MinHeight="30" MinWidth="30" Margin="3,0,3,0" ToolTip="Добавить игроков в инициативу"
                                                 Command="{Binding AddCreatureInitiative}"
                                                 CommandParameter="{Binding SelectedItems, ElementName=charactersLBox}">
-                                            <Button.Background>
-                                                <ImageBrush/>
-                                            </Button.Background>
-                                            <Image Source = "/icons8-мужчина-стоит-50.png"/>
+                                            <Image Source="/Images/icons8-мужчина-стоит-50.png" Width="30" Height="30"/>
                                         </Button>
-                                        <Button Content="X" MinHeight="50" MinWidth="50" Margin="12,0,3,0" ToolTip="Очистить поле и окончить бой" Command="{Binding EndInitiative}"/>
+                                        <Button Content="X" MinHeight="30" MinWidth="30" Margin="12,0,3,0" ToolTip="Очистить поле и окончить бой" Command="{Binding EndInitiative}"/>
                                     </StackPanel>
-                                    <ScrollViewer Grid.Row="1">
+                                    <StackPanel Grid.Row="1">
+                                        <Expander Header="Убитые существа" FontSize="20">
+                                            <ListBox ItemsSource="{Binding DeathListInitiatives, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedDeath}">
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Name}" />
+                                                            <Button Content="Вернуть">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="Click">
+                                                                        <i:ChangePropertyAction TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" PropertyName="IsSelected" Value="True" />
+                                                                        <i:InvokeCommandAction Command="{Binding DataContext.ReturnInitiative, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                        </Expander>
+                                    </StackPanel>
+                                    <ScrollViewer Grid.Row="2">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*"/>
@@ -1230,22 +1250,60 @@
                                         <Button Content="Сохранить" Command="{Binding SaveNotesCommand}" Margin="5"/>
                                     </StackPanel>
                                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                        <Button Command="EditingCommands.ToggleBold" CommandTarget="{Binding ElementName=CreatingNotes}" >
+                                        <Button Command="EditingCommands.ToggleBold" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Жирный" Margin="3,0,3,0">
                                             <Image Source="/Images/free-icon-bold-235524.png" Width="20"/>
                                         </Button>
-                                        <Button Command="EditingCommands.ToggleItalic" CommandTarget="{Binding ElementName=CreatingNotes}">
+                                        <Button Command="EditingCommands.ToggleItalic" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Курсив" Margin="3,0,3,0">
                                             <Image Source="/Images/free-icon-italic-142351.png" Width="20"/>
                                         </Button>
-                                        <Button Command="EditingCommands.ToggleUnderline" CommandTarget="{Binding ElementName=CreatingNotes}">
+                                        <Button Command="EditingCommands.ToggleUnderline" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Подчеркивание" Margin="3,0,3,0">
                                             <Image Source="/Images/free-icon-underline-text-option-25433.png" Width="20"/>
                                         </Button>
+                                        <Button Width="25" Command="EditingCommands.ToggleBullets" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Маркеры" Margin="3,0,3,0">
+                                            <Image Source="/Images/free-icon-numbering-2407849.png" Width="25"/>
+                                        </Button>
 
+                                        <Button Command="EditingCommands.AlignLeft" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Отцентровать текст по левому краю" Margin="3,0,3,0">
+                                            <Image Source="/Images/free-icon-align-left-4355223.png" Width="25"/>
+                                        </Button>
+                                        <Button Command="EditingCommands.AlignCenter" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Отцентровать текст по центру" Margin="3,0,3,0">
+                                            <Image Source="/Images/free-icon-align-center-1994232.png" Width="25"/>
+                                        </Button>
+                                        <Button Command="EditingCommands.AlignRight" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Отцентровать текст по правому краю" Margin="3,0,3,0">
+                                            <Image Source="/Images/free-icon-align-right-4355227.png" Width="25"/>
+                                        </Button>
+
+                                        <Button Command="EditingCommands.IncreaseIndentation" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Увеличить отступ" Margin="3,0,3,0">
+                                            <Image Source="/Images/free-icon-indent-7560643.png" Width="25"/>
+                                        </Button>
+                                        <Button Command="EditingCommands.DecreaseIndentation" CommandTarget="{Binding ElementName=CreatingNotes}" ToolTip="Уменьшить отступ" Margin="3,0,3,0">
+                                            <Image Source="/Images/free-icon-indent-7560642.png" Width="25"/>
+                                        </Button>
+                                        <xctk:ColorPicker SelectedColor="{Binding ColorPick}" DisplayColorAndName="False" Margin="3,0,3,0" Width="40"/>
+                                        <StackPanel Orientation="Vertical">
+                                            <Button Content="A" Click="TextColorChange" Margin="3,0,3,0" FontFamily="Times New Roman" Width="25" ToolTip="Цвет текста"/>
+                                            <TextBlock Background="{Binding ColorPick, Converter={StaticResource ColorToBrushConverter}}" Height="10" Margin="2"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Vertical">
+                                            <Button Click="BacgroundColorChange" Margin="3,0,3,0" Background="{Binding ColorPick}" FontFamily="Times New Roman" ToolTip="Цвет выделения текста">
+                                                <Image Source="/Images/free-icon-pen-4409298.png" Width="25"/>
+                                            </Button>
+                                            <TextBlock Background="{Binding ColorPick, Converter={StaticResource ColorToBrushConverter}}" Height="10" Margin="2"/>
+                                        </StackPanel>
                                     </StackPanel>
                                     <StackPanel Grid.Row="2" Orientation="Horizontal">
                                         <TextBlock Text="Название заметки"/>
                                         <TextBox Text="{Binding FileName}" MinWidth="200"/>
                                     </StackPanel>
-                                    <RichTextBox x:Name="CreatingNotes" Grid.Row="3" local:RichTextBoxHelper.DocumentXaml="{Binding RichTextDocument, Mode=TwoWay}"/>
+                                    <RichTextBox x:Name="CreatingNotes" Grid.Row="3" 
+                                                 local:RichTextBoxHelper.DocumentXaml="{Binding RichTextDocument, Mode=TwoWay}" 
+                                                 AcceptsTab="True" AcceptsReturn="True" SpellCheck.IsEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto" FontSize="16">
+                                        <RichTextBox.Resources>
+                                            <Style TargetType="Paragraph">
+                                                <Setter Property="Margin" Value="2,5" />
+                                            </Style>
+                                        </RichTextBox.Resources>
+                                    </RichTextBox>
                                 </Grid>
                             </Grid>
                         </TabItem>
@@ -1268,6 +1326,10 @@
                     <RichTextBox Grid.Column="1" local:RichTextBoxHelper.DocumentXaml="{Binding NoteContent, Mode=TwoWay}" IsReadOnly="True"/>
                 </Grid>
             </TabItem>
+            <TabItem Header="Арсенал" FontFamily="pack://application:,,,/fonts/#Vinque Rg">
+                
+            </TabItem>
+            
         </TabControl>
 
     </Grid>

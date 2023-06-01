@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -32,12 +33,16 @@ namespace WarhammerAGM
             db.Initiatives.Load();
             db.TemporaryInitiatives.Load();
 
+            db.DeathListInitiatives.Load();
+
             EditableBC = new();
             EditableBCViewInitiative = new();
             EditableBCView = new();
             EditableC_CheckBox = new();
             EditableC = new();
             EditableI = new();
+            EditableDeath = new();
+
             CreatureBases = db.CreatureBases.Local.ToObservableCollection();
             BestiaryCreatures = db.BestiaryCreatures.Local.ToObservableCollection();
             Characters = db.Characters.Local.ToObservableCollection();
@@ -48,7 +53,11 @@ namespace WarhammerAGM
             TemporaryInitiatives = db.TemporaryInitiatives.Local.ToBindingList();
             TemporaryInitiatives.ListChanged += OnInitiativesChanged;
 
+            DeathListInitiatives = db.DeathListInitiatives.Local.ToBindingList();
+
             FileNames = new ObservableCollection<string>();
+
+            ColorPick = Colors.Black;
 
             Round = Properties.Settings.Default.RoundSetting;
             SliderValueChange = "0";
@@ -61,6 +70,8 @@ namespace WarhammerAGM
 
         public BindingList<Initiative> Initiatives { get; set; }
         public BindingList<TemporaryInitiative> TemporaryInitiatives { get; }
+
+        public BindingList<DeathListInitiative> DeathListInitiatives { get; set; }
 
         //private List<Initiative> OldListInitiative;
         //private List<TemporaryInitiative> OldListTemporary;
@@ -93,6 +104,11 @@ namespace WarhammerAGM
         public Initiative EditableI
         {
             get => Get<Initiative>()!;
+            private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
+        }
+        public DeathListInitiative EditableDeath
+        {
+            get => Get<DeathListInitiative>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
         }
         public BestiaryCreature EditableBCViewInitiativeStats
@@ -129,6 +145,11 @@ namespace WarhammerAGM
         public Initiative? SelectedI
         {
             get => Get<Initiative?>();
+            set => Set(value);
+        }
+        public DeathListInitiative? SelectedDeath
+        {
+            get => Get<DeathListInitiative?>();
             set => Set(value);
         }
 
@@ -218,6 +239,14 @@ namespace WarhammerAGM
                 //EditableI.CreatureBase.Ballistics = 10;
                 //EditableBCViewInitiativeStats = BestiaryCreatures[EditableI.Id];
             }
+            if (propertyName == nameof(SelectedDeath))
+            {
+                DeathListInitiative? @new = (DeathListInitiative?)newValue;
+                if (@new is null)
+                    EditableDeath = new();
+                else
+                    EditableDeath = db.DeathListInitiatives.AsNoTracking().First(bc => bc.Id == @new.Id);
+            }
         }
         /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
         public RelayCommand DeleteCommand => GetCommand(
@@ -260,6 +289,7 @@ namespace WarhammerAGM
                 }
                 else
                     db.SaveChanges();
+                db.SaveChanges();
             }
             if (e.ListChangedType == ListChangedType.Reset)
             {
@@ -525,6 +555,24 @@ namespace WarhammerAGM
         (value) =>
         {
             SliderValueChange = "0";
+            int index = Initiatives.TakeWhile(bc => bc.Id != EditableI.Id).Count();
+            if (Initiatives[index].СurrentWounds == 0)
+            {
+                DeathListInitiative deathListInitiative = new()
+                {
+                    Name = Initiatives[index].Name,
+                    CreatureBase = Initiatives[index].CreatureBase,
+                    CreatureBaseId = Initiatives[index].CreatureBaseId,
+                    Wounds = Initiatives[index].Wounds,
+                    СurrentWounds = Initiatives[index].Wounds,
+                    Importancenitiative = Initiatives[index].Importancenitiative,
+                    DexterityModifier = Initiatives[index].DexterityModifier,
+                    Type = Initiatives[index].Type
+                };
+                DeathListInitiatives.Add(deathListInitiative);
+                Initiatives.Remove(Initiatives[index]);
+                db.SaveChanges();
+            }
         });
         public string SliderValueChange
         {
@@ -549,11 +597,33 @@ namespace WarhammerAGM
                 SliderValueChange = changevalue.ToString();
 
         });
+        public RelayCommand ReturnInitiative => GetCommand(
+            () =>
+            {
+                Random rnd = new();
+                int indexDI = DeathListInitiatives.TakeWhile(bc => bc.Id != EditableDeath.Id).Count();
+                int indexCB = CreatureBases.TakeWhile(bc => bc.Id != EditableDeath.CreatureBaseId).Count();
+                Initiative initiative = new()
+                {
+                    CreatureBase = CreatureBases[indexCB],
+                    Name = EditableDeath.Name,
+                    Wounds = EditableDeath.Wounds,
+                    СurrentWounds = EditableDeath.Wounds,
+                    Importancenitiative = rnd.Next(1, 10) + EditableDeath.DexterityModifier,
+                    DexterityModifier = EditableDeath.DexterityModifier,
+                    Type = EditableDeath.Type
+                };
+                initiative.Id = 0;
+                Initiatives.Add(initiative);
+                DeathListInitiatives.Remove(DeathListInitiatives[indexDI]);
+                db.SaveChanges();
+            });
         public RelayCommand EndInitiative => GetCommand(
             () =>
             {
                 Initiatives.Clear();
                 TemporaryInitiatives.Clear();
+                DeathListInitiatives.Clear();
 
                 Round = 0;
                 Properties.Settings.Default.RoundSetting = Round;
@@ -688,7 +758,7 @@ namespace WarhammerAGM
         {
             string appFolderPath = AppDomain.CurrentDomain.BaseDirectory; // Получаем путь к основной папке приложения
             string notesFolderPath = Path.Combine(appFolderPath, "Notes"); // Объединяем путь с подпапкой "Notes"
-            // Создаем уникальное имя файла на основе текущей даты и времени
+                                                                           // Создаем уникальное имя файла на основе текущей даты и времени
             if (string.IsNullOrWhiteSpace(FileName))
             {
                 MessageBox.Show("Введите название заметки(оно не должно быть пустым или состоять только из проблелов");
@@ -710,10 +780,10 @@ namespace WarhammerAGM
                     RichTextDocument = buf;
                 }
             }
-                File.WriteAllText(filePath, RichTextDocument);
-                FileNames.Add(FileName);
-                RichTextDocument = null;
-                FileName = null;
+            File.WriteAllText(filePath, RichTextDocument);
+            FileNames.Add(FileName);
+            RichTextDocument = null;
+            FileName = null;
         });
         public void LoadFileNames()
         {
@@ -743,7 +813,16 @@ namespace WarhammerAGM
                 RichTextDocument = null;
                 FileName = null;
             });
-
+        public Color ColorPick
+        {
+            get => Get<Color>()!;
+            set => Set(value);
+        }
+        public double? FontSizeRichTextBoxSelectedText
+        {
+            get => Get<double>()!;
+            set => Set(value);
+        }
     }
 
 }
