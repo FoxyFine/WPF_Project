@@ -15,6 +15,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using ViewModels;
 using WarhammerAGM.Models;
+using WarhammerAGM.Models.Arsenal.Money;
+using WarhammerAGM.Models.Arsenal.Weapons;
 using WarhammerAGM.Models.WarhammerAGM.Models;
 
 namespace WarhammerAGM
@@ -32,8 +34,17 @@ namespace WarhammerAGM
 
             db.Initiatives.Load();
             db.TemporaryInitiatives.Load();
-
             db.DeathListInitiatives.Load();
+
+            db.IncomeAndSocialClasses.Load();
+            db.ScumbagIncomes.Load();
+
+            db.MeleeWeapons.Load();
+            db.RangedWeapons.Load();
+            db.WeaponProperties.Load();
+            db.WeaponImprovements.Load();
+            db.Ammunitions.Load();
+            db.Worlds.Load();
 
             EditableBC = new();
             EditableBCViewInitiative = new();
@@ -52,8 +63,20 @@ namespace WarhammerAGM
 
             TemporaryInitiatives = db.TemporaryInitiatives.Local.ToBindingList();
             TemporaryInitiatives.ListChanged += OnInitiativesChanged;
-
             DeathListInitiatives = db.DeathListInitiatives.Local.ToBindingList();
+
+            IncomeAndSocialClasses = db.IncomeAndSocialClasses.Local.ToObservableCollection();
+            ScumbagIncomes = db.ScumbagIncomes.Local.ToObservableCollection();
+
+            MeleeWeapons = db.MeleeWeapons.Local.ToObservableCollection();
+            RangedWeapons = db.RangedWeapons.Local.ToObservableCollection();
+            WeaponProperties = db.WeaponProperties.Local.ToObservableCollection();
+            WeaponImprovements = db.WeaponImprovements.Local.ToObservableCollection();
+            Ammunitions = db.Ammunitions.Local.ToObservableCollection();
+            Worlds = db.Worlds.Local.ToBindingList();
+
+            SelectedWorldWeaponsMelee = Worlds.FirstOrDefault();
+            SelectedWorldWeaponsRanged = Worlds.FirstOrDefault();
 
             FileNames = new ObservableCollection<string>();
 
@@ -70,8 +93,17 @@ namespace WarhammerAGM
 
         public BindingList<Initiative> Initiatives { get; set; }
         public BindingList<TemporaryInitiative> TemporaryInitiatives { get; }
-
         public BindingList<DeathListInitiative> DeathListInitiatives { get; set; }
+
+        public ObservableCollection<IncomeAndSocialClass> IncomeAndSocialClasses { get; set; }
+        public ObservableCollection<ScumbagIncome> ScumbagIncomes { get; set; }
+
+        public ObservableCollection<MeleeWeapon> MeleeWeapons { get; set; }
+        public ObservableCollection<RangedWeapon> RangedWeapons { get; set; }
+        public ObservableCollection<WeaponPropertie> WeaponProperties { get; set; }
+        public ObservableCollection<WeaponImprovement> WeaponImprovements { get; set; }
+        public ObservableCollection<Ammunition> Ammunitions { get; set; }
+        public BindingList<World> Worlds { get; set; }
 
         //private List<Initiative> OldListInitiative;
         //private List<TemporaryInitiative> OldListTemporary;
@@ -823,6 +855,326 @@ namespace WarhammerAGM
             get => Get<double>()!;
             set => Set(value);
         }
-    }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public ObservableCollection<MeleeWeapon> MeleeWeaponsViewPrimitive { get; set; } = new ObservableCollection<MeleeWeapon>();
+        public ObservableCollection<MeleeWeapon> MeleeWeaponsViewChain { get; set; } = new ObservableCollection<MeleeWeapon>();
+        public ObservableCollection<MeleeWeapon> MeleeWeaponsViewPower { get; set; } = new ObservableCollection<MeleeWeapon>();
+        public ObservableCollection<MeleeWeapon> MeleeWeaponsViewShock { get; set; } = new ObservableCollection<MeleeWeapon>();
 
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewLaser { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewBullet { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewBolter { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewMelta { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewPlasma { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewFlamethrower { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewPrimitive { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewBeam { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewGrenades { get; set; } = new ObservableCollection<RangedWeapon>();
+        public ObservableCollection<RangedWeapon> RangedWeaponsViewExotic { get; set; } = new ObservableCollection<RangedWeapon>();
+
+
+        public bool VisibilityPrimitiveMelee
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityChainMelee
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityPowerMelee
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityShockMelee
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+
+        private World selectedworldWeaponsMelee;
+        public World SelectedWorldWeaponsMelee
+        {
+            get { return selectedworldWeaponsMelee; }
+            set
+            {
+                selectedworldWeaponsMelee = value;
+                WeaponViewWorld();
+            }
+        }
+        public void WeaponViewWorld()
+        {
+            if (MeleeWeapons.Count == 0)
+                return;
+            var weapons = db.MeleeWeapons.Where(w => w.World == SelectedWorldWeaponsMelee.Name).ToList();
+
+            MeleeWeaponsViewPrimitive.Clear();
+            MeleeWeaponsViewChain.Clear();
+            MeleeWeaponsViewPower.Clear();
+            MeleeWeaponsViewShock.Clear();
+            db.SaveChanges();
+
+            // Добавляем элементы в существующую коллекцию
+            foreach (var weapon in weapons)
+            {
+                if (weapon.Type == "Primitive")
+                {
+                    MeleeWeaponsViewPrimitive.Add(weapon);
+                }
+                else
+                {
+                    if (weapon.Type == "Chain")
+                    {
+                        MeleeWeaponsViewChain.Add(weapon);
+                    }
+                    else
+                    {
+                        if (weapon.Type == "Power")
+                        {
+                            MeleeWeaponsViewPower.Add(weapon);
+                        }
+                        else
+                        {
+                            if (weapon.Type == "Shock")
+                            {
+                                MeleeWeaponsViewShock.Add(weapon);
+                            }
+                        }
+                    }
+                }
+            }
+            db.SaveChanges();
+            if (MeleeWeaponsViewPrimitive.Count != 0)
+                VisibilityPrimitiveMelee = true;
+            else
+            { VisibilityPrimitiveMelee = false; }
+
+            if (MeleeWeaponsViewChain.Count != 0)
+            { VisibilityChainMelee = true; }
+            else
+            { VisibilityChainMelee = false; }
+
+            if (MeleeWeaponsViewPower.Count != 0)
+                VisibilityPowerMelee = true;
+            else
+            { VisibilityPowerMelee = false; }
+
+            if (MeleeWeaponsViewShock.Count != 0)
+                VisibilityShockMelee = true;
+            else 
+            { VisibilityShockMelee = false; }
+        }
+        private World selectedworldWeaponsRanged;
+        public World SelectedWorldWeaponsRanged
+        {
+            get { return selectedworldWeaponsRanged; }
+            set
+            {
+                selectedworldWeaponsRanged = value;
+                RangedViewWorld();
+            }
+        }
+        public bool VisibilityLaserRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityBulletRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityBolterRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityMeltaRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityPlasmaRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityFlamethrowerRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityPrimitiveRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityBeamRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityGrenadesRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityExoticRanged
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public void RangedViewWorld()
+        {
+
+            if (MeleeWeapons.Count == 0)
+                return;
+            var weapons = db.RangedWeapons.Where(w => w.World == SelectedWorldWeaponsMelee.Name).ToList();
+
+            RangedWeaponsViewLaser.Clear();
+            RangedWeaponsViewBullet.Clear();
+            RangedWeaponsViewBolter.Clear();
+            RangedWeaponsViewMelta.Clear();
+            RangedWeaponsViewPlasma.Clear();
+            RangedWeaponsViewFlamethrower.Clear();
+            RangedWeaponsViewPrimitive.Clear();
+            RangedWeaponsViewBeam.Clear();
+            RangedWeaponsViewGrenades.Clear();
+            RangedWeaponsViewExotic.Clear();
+            db.SaveChanges();
+
+            // Добавляем элементы в существующую коллекцию
+            foreach (var weapon in weapons)
+            {
+                if (weapon.Type == "Laser")
+                {
+                    RangedWeaponsViewLaser.Add(weapon);
+                }
+                else
+                {
+                    if (weapon.Type == "Bullet")
+                    {
+                        RangedWeaponsViewBullet.Add(weapon);
+                    }
+                    else
+                    {
+                        if (weapon.Type == "Bolter")
+                        {
+                            RangedWeaponsViewBolter.Add(weapon);
+                        }
+                        else
+                        {
+                            if (weapon.Type == "Melta")
+                            {
+                                RangedWeaponsViewMelta.Add(weapon);
+                            }
+                            else
+                            {
+                                if (weapon.Type == "Plasma")
+                                {
+                                    RangedWeaponsViewPlasma.Add(weapon);
+                                }
+                                else
+                                {
+                                    if (weapon.Type == "Flamethrower")
+                                    {
+                                        RangedWeaponsViewFlamethrower.Add(weapon);
+                                    }
+                                    else
+                                    {
+                                        if (weapon.Type == "Primitive")
+                                        {
+                                            RangedWeaponsViewPrimitive.Add(weapon);
+                                        }
+                                        else
+                                        {
+                                            if (weapon.Type == "Beam")
+                                            {
+                                                RangedWeaponsViewBeam.Add(weapon);
+                                            }
+                                            else
+                                            {
+                                                if (weapon.Type == "Grenades")
+                                                {
+                                                    RangedWeaponsViewGrenades.Add(weapon);
+                                                }
+                                                else
+                                                {
+                                                    if (weapon.Type == "Exotic")
+                                                    {
+                                                        RangedWeaponsViewExotic.Add(weapon);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                db.SaveChanges();
+                if (RangedWeaponsViewLaser.Count == 0)
+                    VisibilityLaserRanged = true;
+                else
+                { VisibilityLaserRanged = false; }
+
+
+                if (RangedWeaponsViewBullet.Count == 0)
+                    VisibilityBulletRanged = true;
+                else
+                { VisibilityBulletRanged = false; }
+
+
+                if (RangedWeaponsViewBolter.Count == 0)
+                    VisibilityBolterRanged = true;
+                else
+                { VisibilityBolterRanged = false; }
+
+
+                if (RangedWeaponsViewMelta.Count == 0)
+                    VisibilityMeltaRanged = true;
+                else
+                { VisibilityMeltaRanged = false; }
+
+
+                if (RangedWeaponsViewPlasma.Count == 0)
+                    VisibilityPlasmaRanged = true;
+                else
+                { VisibilityPlasmaRanged = false; }
+
+
+                if (RangedWeaponsViewFlamethrower.Count == 0)
+                    VisibilityFlamethrowerRanged = true;
+                else
+                { VisibilityFlamethrowerRanged = false; }
+
+
+                if (RangedWeaponsViewPrimitive.Count == 0)
+                    VisibilityPrimitiveRanged = false;
+                else
+                { VisibilityPrimitiveRanged = false; }
+
+
+                if (RangedWeaponsViewBeam.Count == 0)
+                    VisibilityBeamRanged = false;
+                else
+                { VisibilityBeamRanged = false; }
+
+
+                if (RangedWeaponsViewGrenades.Count == 0)
+                    VisibilityGrenadesRanged = false;
+                else
+                { VisibilityGrenadesRanged = false; }
+
+
+                if (RangedWeaponsViewExotic.Count == 0)
+                    VisibilityExoticRanged = false;
+                else
+                { VisibilityExoticRanged = false; }
+            }
+        }
+    }
 }

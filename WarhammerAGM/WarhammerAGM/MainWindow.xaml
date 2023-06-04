@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:WarhammerAGM" xmlns:models="clr-namespace:WarhammerAGM.Models" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="MainWindow" Height="670" Width="1090"
+        Title="MainWindow" Height="710" Width="1130"
         FontSize="16"
         DataContext="{DynamicResource vm}"
         Name="AGM">
@@ -17,11 +17,13 @@
         <local:DoubleConverter x:Key="DoubleConverter"/>
         <local:ValueProxy x:Key="Proxy"/>
         <local:VisibilityConverter x:Key="VisibilityConverter" />
+        <local:VisibilityConverterTrueFalse x:Key="VisibilityConverterTrueFalse" />
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter" />
         <CollectionViewSource x:Key="bestiaryCreatureViewInitiative" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="bestiaryCreatureView" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="bestiaryCreatureEdit" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="characterView" Source="{Binding Characters}"/>
+        <CollectionViewSource x:Key="weaponPropertiesView" Source="{Binding WeaponProperties}"/>
         <Style x:Key="RepeatButtonTransparent" TargetType="{x:Type RepeatButton}">
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -329,7 +331,7 @@
                             UpdateSourceTrigger=PropertyChanged}"/>
                         <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
                                          SelectedItem="{Binding SelectedBCView}"
-                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
+                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}"> <!--ПРОСМОТРЕТЬ-->
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name, Mode=OneTime}"  />
@@ -627,6 +629,11 @@
                                     </ListBox>
                                 </Grid>
                             </TabItem>
+                            <TabItem Header="Крит.Урон" FontSize="24">
+                                <Grid>
+
+                                </Grid>
+                            </TabItem>
                         </TabControl>
                     </Grid>
                     <GridSplitter Grid.Column="3" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
@@ -806,10 +813,10 @@
                                               d:DataContext="{d:DesignInstance Type=models:BestiaryCreature}">
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
-                                                    <Setter Property="DataContext" Value="{Binding EditableBC}"/>
+                                                    <Setter Property="DataContext" Value="{Binding EditableBC, Source={StaticResource vm}}"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Mode, Source={StaticResource vm}}" Value="View">
-                                                            <Setter Property="DataContext" Value="{Binding SelectedBC}"/>
+                                                            <Setter Property="DataContext" Value="{Binding SelectedBC, Source={StaticResource vm}}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -848,23 +855,23 @@
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Grid.Column="0" Grid.Row="1" Text="ББ"/>
-                                                <TextBox x:Name="BBStatsRead" Grid.Column="0" Grid.Row="2" Text="{Binding Melee}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True" />
+                                                <TextBox x:Name="BBStatsRead" Grid.Column="0" Grid.Row="2" Text="{Binding Melee}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="1" Grid.Row="1" Text="Б"/>
-                                                <TextBox x:Name="BStatsRead" Grid.Column="1" Grid.Row="2" Text="{Binding Ballistics}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="BStatsRead" Grid.Column="1" Grid.Row="2" Text="{Binding Ballistics}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="2" Grid.Row="1" Text="Сил"/>
-                                                <TextBox x:Name="PowStatsRead" Grid.Column="2" Grid.Row="2" Text="{Binding Power}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PowStatsRead" Grid.Column="2" Grid.Row="2" Text="{Binding Power}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="3" Grid.Row="1" Text="Вын"/>
-                                                <TextBox x:Name="EndurStatsRead" Grid.Column="3" Grid.Row="2" Text="{Binding Endurance}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="EndurStatsRead" Grid.Column="3" Grid.Row="2" Text="{Binding Endurance}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="4" Grid.Row="1" Text="Лов"/>
-                                                <TextBox x:Name="DexStatsRead" Grid.Column="4" Grid.Row="2" Text="{Binding Dexterity}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="DexStatsRead" Grid.Column="4" Grid.Row="2" Text="{Binding Dexterity}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="5" Grid.Row="1" Text="Инт"/>
-                                                <TextBox x:Name="IntStatsRead" Grid.Column="5" Grid.Row="2" Text="{Binding Intelligence}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="IntStatsRead" Grid.Column="5" Grid.Row="2" Text="{Binding Intelligence}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="6" Grid.Row="1" Text="Вос"/>
-                                                <TextBox x:Name="PerStatsRead" Grid.Column="6" Grid.Row="2" Text="{Binding Perception}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PerStatsRead" Grid.Column="6" Grid.Row="2" Text="{Binding Perception}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="7" Grid.Row="1" Text="СВ"/>
-                                                <TextBox x:Name="WillPowStatsRead" Grid.Column="7" Grid.Row="2" Text="{Binding Willpower}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="WillPowStatsRead" Grid.Column="7" Grid.Row="2" Text="{Binding Willpower}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="8" Grid.Row="1" Text="Тов"/>
-                                                <TextBox x:Name="PartStatsRead" Grid.Column="8" Grid.Row="2" Text="{Binding Partnership}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PartStatsRead" Grid.Column="8" Grid.Row="2" Text="{Binding Partnership}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                             </Grid>
 
 
@@ -883,7 +890,7 @@
                                                 </Grid.ColumnDefinitions>
 
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Раны:" Margin="5"/>
-                                                <TextBox Text="{Binding Wounds}" Grid.Row="0" Grid.Column="1" Margin="5"/>
+                                                <TextBox Text="{Binding Wounds}" Grid.Row="0" Grid.Column="1" Margin="5" MaxLength="3"/>
                                                 <TextBlock Grid.Row="0" Grid.Column="2" Text="Скорость:" Margin="5"/>
                                                 <xctk:MaskedTextBox Grid.Row="0" Grid.Column="3" Text="{Binding Speed}" Mask="00/00/00/00"/>
 
@@ -948,7 +955,7 @@
                                     </UniformGrid>
 
                                     <UniformGrid Rows="1" Columns="3"
-                                                 Visibility="{Binding Mode, Converter={local:ViewModeC True}}">
+                                                 Visibility="{Binding Mode, Converter={local:ViewMode True}}">
                                         <TextBlock Text="{Binding Mode, StringFormat={}Режим: {0}}" VerticalAlignment="Center"/>
                                         <Button Content="Сохранить"
                                             Command="{Binding Save}"/>
@@ -1012,10 +1019,10 @@
                                               d:DataContext="{d:DesignInstance Type=models:Character}">
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
-                                                    <Setter Property="DataContext" Value="{Binding EditableC}"/>
+                                                    <Setter Property="DataContext" Value="{Binding EditableC, Source={StaticResource vm}}"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding ModeC, Source={StaticResource vm}}" Value="ViewC">
-                                                            <Setter Property="DataContext" Value="{Binding SelectedC}"/>
+                                                            <Setter Property="DataContext" Value="{Binding SelectedC, Source={StaticResource vm}}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -1056,21 +1063,21 @@
                                                 <TextBlock Grid.Column="0" Grid.Row="1" Text="ББ"/>
                                                 <TextBox x:Name="BBStatsC" Grid.Column="0" Grid.Row="2" Text="{Binding Melee}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True" />
                                                 <TextBlock Grid.Column="1" Grid.Row="1" Text="Б"/>
-                                                <TextBox x:Name="BStatsC" Grid.Column="1" Grid.Row="2" Text="{Binding Ballistics}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="BStatsC" Grid.Column="1" Grid.Row="2" Text="{Binding Ballistics}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="2" Grid.Row="1" Text="Сил"/>
-                                                <TextBox x:Name="PowStatsC" Grid.Column="2" Grid.Row="2" Text="{Binding Power}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PowStatsC" Grid.Column="2" Grid.Row="2" Text="{Binding Power}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="3" Grid.Row="1" Text="Вын"/>
-                                                <TextBox x:Name="EndurStatsC" Grid.Column="3" Grid.Row="2" Text="{Binding Endurance}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="EndurStatsC" Grid.Column="3" Grid.Row="2" Text="{Binding Endurance}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="4" Grid.Row="1" Text="Лов"/>
-                                                <TextBox x:Name="DexStatsC" Grid.Column="4" Grid.Row="2" Text="{Binding Dexterity}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="DexStatsC" Grid.Column="4" Grid.Row="2" Text="{Binding Dexterity}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="5" Grid.Row="1" Text="Инт"/>
-                                                <TextBox x:Name="IntStatC" Grid.Column="5" Grid.Row="2" Text="{Binding Intelligence}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="IntStatC" Grid.Column="5" Grid.Row="2" Text="{Binding Intelligence}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="6" Grid.Row="1" Text="Вос"/>
-                                                <TextBox x:Name="PerStatsC" Grid.Column="6" Grid.Row="2" Text="{Binding Perception}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PerStatsC" Grid.Column="6" Grid.Row="2" Text="{Binding Perception}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="7" Grid.Row="1" Text="СВ"/>
-                                                <TextBox x:Name="WillPowStatsC" Grid.Column="7" Grid.Row="2" Text="{Binding Willpower}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="WillPowStatsC" Grid.Column="7" Grid.Row="2" Text="{Binding Willpower}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                                 <TextBlock Grid.Column="8" Grid.Row="1" Text="Тов"/>
-                                                <TextBox x:Name="PartStatsC" Grid.Column="8" Grid.Row="2" Text="{Binding Partnership}" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
+                                                <TextBox x:Name="PartStatsC" Grid.Column="8" Grid.Row="2" Text="{Binding Partnership}" MaxLength="3" AttachedBehaviors:TextBoxBehavior.IsInteger="True"/>
                                             </Grid>
 
 
@@ -1089,10 +1096,9 @@
                                                 </Grid.ColumnDefinitions>
 
                                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Раны:" Margin="5"/>
-                                                <TextBox Text="{Binding Wounds}" Grid.Row="0" Grid.Column="1" Margin="5"/>
+                                                <TextBox Text="{Binding Wounds}" Grid.Row="0" Grid.Column="1" Margin="5" MaxLength="3"/>
                                                 <TextBlock Grid.Row="0" Grid.Column="2" Text="Скорость:" Margin="5"/>
                                                 <xctk:MaskedTextBox Grid.Row="0" Grid.Column="3" Text="{Binding Speed}" Mask="00/00/00/00"/>
-
                                             </Grid>
 
 
@@ -1106,16 +1112,16 @@
                                                     <RowDefinition Height="Auto"/>
                                                     <RowDefinition Height="Auto"/>
                                                 </Grid.RowDefinitions>
-                                                <Expander Grid.Row="0" Margin="5" Header="Описание"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                <Expander Grid.Row="0" Margin="5" Header="Описание" Padding="5" BorderBrush="LightBlue" BorderThickness="2">
                                                     <TextBox FontSize="14" Text="{Binding Description}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
                                                 </Expander>
-                                                <Expander Grid.Row="1" Margin="5" Header="Умения"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                <Expander Grid.Row="1" Margin="5" Header="Умения" Padding="5" BorderBrush="LightBlue" BorderThickness="2">
                                                     <TextBox Text="{Binding Skills}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
                                                 </Expander>
-                                                <Expander Grid.Row="2" Margin="5" Header="Таланты"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                <Expander Grid.Row="2" Margin="5" Header="Таланты" Padding="5" BorderBrush="LightBlue" BorderThickness="2">
                                                     <TextBox Text="{Binding Talents}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" MinHeight="100"/>
                                                 </Expander>
-                                                <Expander Grid.Row="3" Margin="5" Header="Броня и Оружие"  Padding="5" BorderBrush="LightBlue" BorderThickness="2">
+                                                <Expander Grid.Row="3" Margin="5" Header="Броня и Оружие" Padding="5" BorderBrush="LightBlue" BorderThickness="2">
                                                     <Grid>
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="Auto"/>
@@ -1281,11 +1287,11 @@
                                         </Button>
                                         <xctk:ColorPicker SelectedColor="{Binding ColorPick}" DisplayColorAndName="False" Margin="3,0,3,0" Width="40"/>
                                         <StackPanel Orientation="Vertical">
-                                            <Button Content="A" Click="TextColorChange" Margin="3,0,3,0" FontFamily="Times New Roman" Width="25" ToolTip="Цвет текста"/>
+                                            <Button Content="A"  Margin="3,0,3,0" FontFamily="Times New Roman" Width="25" ToolTip="Цвет текста"/>
                                             <TextBlock Background="{Binding ColorPick, Converter={StaticResource ColorToBrushConverter}}" Height="10" Margin="2"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Vertical">
-                                            <Button Click="BacgroundColorChange" Margin="3,0,3,0" Background="{Binding ColorPick}" FontFamily="Times New Roman" ToolTip="Цвет выделения текста">
+                                            <Button  Margin="3,0,3,0" Background="{Binding ColorPick}" FontFamily="Times New Roman" ToolTip="Цвет выделения текста">
                                                 <Image Source="/Images/free-icon-pen-4409298.png" Width="25"/>
                                             </Button>
                                             <TextBlock Background="{Binding ColorPick, Converter={StaticResource ColorToBrushConverter}}" Height="10" Margin="2"/>
@@ -1305,6 +1311,11 @@
                                         </RichTextBox.Resources>
                                     </RichTextBox>
                                 </Grid>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Генераторы">
+                            <Grid>
+
                             </Grid>
                         </TabItem>
                     </TabControl>
@@ -1327,9 +1338,485 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Арсенал" FontFamily="pack://application:,,,/fonts/#Vinque Rg">
-                
+                <Grid>
+                    <TabControl FontSize="22">
+                        <TabItem Header="Оружие">
+                            <Grid>
+                                <TabControl FontSize="20">
+                                    <TabItem Header="Оружие ближнего боя">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+                                            <ComboBox Grid.Row="0" ItemsSource="{Binding Worlds, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedWorldWeaponsMelee}" DisplayMemberPath="Name" Grid.ColumnSpan="3"/>
+                                            <ScrollViewer Grid.Row="1" Grid.ColumnSpan="3">
+                                                <Grid>
+                                                    <StackPanel>
+                                                        <StackPanel>
+                                                            <TextBlock Text="Примитивное" Visibility="{Binding VisibilityPrimitiveMelee, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                            <ListView ItemsSource="{Binding MeleeWeaponsViewPrimitive}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityPrimitiveMelee, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                <ListView.View>
+                                                                    <GridView>
+                                                                        <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                        <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                        <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                        <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                        <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                        <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                        <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                        <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                        <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                    </GridView>
+                                                                </ListView.View>
+                                                            </ListView>
+                                                        </StackPanel>
+                                                        <StackPanel>
+                                                            <TextBlock Text="Цепное" Visibility="{Binding VisibilityChainMelee, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                            <ListView ItemsSource="{Binding MeleeWeaponsViewChain}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityChainMelee, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                <ListView.View>
+                                                                    <GridView>
+                                                                        <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                        <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                        <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                        <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                        <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                        <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                        <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                        <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                        <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                    </GridView>
+                                                                </ListView.View>
+                                                            </ListView>
+                                                        </StackPanel>
+                                                        <StackPanel>
+                                                            <TextBlock Text="Силовое" Visibility="{Binding VisibilityPowerMelee, Converter={StaticResource VisibilityConverterTrueFalse}}" />
+                                                            <ListView ItemsSource="{Binding MeleeWeaponsViewPower}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityPowerMelee, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                <ListView.View>
+                                                                    <GridView>
+                                                                        <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                        <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                        <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                        <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                        <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                        <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                        <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                        <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                        <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                    </GridView>
+                                                                </ListView.View>
+                                                            </ListView>
+                                                        </StackPanel>
+                                                        <StackPanel>
+                                                            <TextBlock Text="Шоковое" Visibility="{Binding VisibilityShockMelee, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                            <ListView ItemsSource="{Binding MeleeWeaponsViewShock}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityShockMelee, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                <ListView.View>
+                                                                    <GridView>
+                                                                        <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                        <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                        <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                        <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                        <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                        <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                        <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                        <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                        <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                    </GridView>
+                                                                </ListView.View>
+                                                            </ListView>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="Оружие дальнего боя">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="103*"/>
+                                                <ColumnDefinition Width="27*"/>
+                                                <ColumnDefinition Width="164*"/>
+                                                <ColumnDefinition Width="477*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ScrollViewer Grid.Column="0" Grid.ColumnSpan="5" Margin="0,0,3,0">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <ComboBox Grid.Row="0" ItemsSource="{Binding Worlds}" SelectedItem="{Binding SelectedWorldWeaponsRanged}" DisplayMemberPath="Name"/>
+                                                    <Grid Grid.Row="1">
+                                                        <StackPanel>
+                                                            <StackPanel>
+                                                                <TextBlock Text="Лазерное" Visibility="{Binding VisibilityLaserRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                <ListView ItemsSource="{Binding RangedWeaponsViewLaser}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityLaserRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                    <ListView.View>
+                                                                        <GridView>
+                                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                            <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                            <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                            <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                            <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                            <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                            <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                        </GridView>
+                                                                    </ListView.View>
+                                                                </ListView>
+                                                            </StackPanel>
+                                                            <StackPanel>
+                                                                <TextBlock Text="Пулевое" Visibility="{Binding VisibilityBulletRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                <ListView ItemsSource="{Binding RangedWeaponsViewBullet}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityBulletRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                    <ListView.View>
+                                                                        <GridView>
+                                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                            <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                            <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                            <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                            <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                            <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                            <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                        </GridView>
+                                                                    </ListView.View>
+                                                                </ListView>
+                                                            </StackPanel>
+                                                            <StackPanel>
+                                                                <TextBlock Text="Болтеры" Visibility="{Binding VisibilityBolterRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                <ListView ItemsSource="{Binding RangedWeaponsViewBolter}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityBolterRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                    <ListView.View>
+                                                                        <GridView>
+                                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                            <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                            <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                            <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                            <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                            <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                            <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                        </GridView>
+                                                                    </ListView.View>
+                                                                </ListView>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="Мельта оружие" Visibility="{Binding VisibilityMeltaRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                    <ListView ItemsSource="{Binding RangedWeaponsViewMelta}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityMeltaRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                        <ListView.View>
+                                                                            <GridView>
+                                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                                <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                                <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                                <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                                <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                                <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                                <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                                <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                                <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                            </GridView>
+                                                                        </ListView.View>
+                                                                    </ListView>
+                                                                </StackPanel>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="Плазменное оружие" Visibility="{Binding VisibilityPlasmaRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                    <ListView ItemsSource="{Binding RangedWeaponsViewPlasma}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityPlasmaRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                        <ListView.View>
+                                                                            <GridView>
+                                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                                <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                                <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                                <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                                <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                                <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                                <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                                <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                                <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                            </GridView>
+                                                                        </ListView.View>
+                                                                    </ListView>
+                                                                </StackPanel>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="Огнемёты" Visibility="{Binding VisibilityFlamethrowerRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                    <ListView ItemsSource="{Binding RangedWeaponsViewFlamethrower}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityFlamethrowerRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                        <ListView.View>
+                                                                            <GridView>
+                                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                                <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                                <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                                <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                                <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                                <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                                <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                                <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                                <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                            </GridView>
+                                                                        </ListView.View>
+                                                                    </ListView>
+                                                                </StackPanel>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="Примитивное оружие" Visibility="{Binding VisibilityPrimitiveRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                    <ListView ItemsSource="{Binding RangedWeaponsViewPrimitive}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityPrimitiveRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                        <ListView.View>
+                                                                            <GridView>
+                                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                                <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                                <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                                <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                                <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                                <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                                <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                                <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                                <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                            </GridView>
+                                                                        </ListView.View>
+                                                                    </ListView>
+                                                                </StackPanel>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="Пусковое оружие" Visibility="{Binding VisibilityBeamRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                    <ListView ItemsSource="{Binding RangedWeaponsViewBeam}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityBeamRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                        <ListView.View>
+                                                                            <GridView>
+                                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                                <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                                <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                                <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                                <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                                <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                                <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                                <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                                <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                            </GridView>
+                                                                        </ListView.View>
+                                                                    </ListView>
+                                                                </StackPanel>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="Гранаты" Visibility="{Binding VisibilityGrenadesRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                    <ListView ItemsSource="{Binding RangedWeaponsViewGrenades}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityGrenadesRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                        <ListView.View>
+                                                                            <GridView>
+                                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                                <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                                <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                                <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                                <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                                <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                                <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                                <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                                <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                            </GridView>
+                                                                        </ListView.View>
+                                                                    </ListView>
+                                                                </StackPanel>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="Экзотическое" Visibility="{Binding VisibilityExoticRanged, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                                    <ListView ItemsSource="{Binding RangedWeaponsViewExotic}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityExoticRanged, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                                        <ListView.View>
+                                                                            <GridView>
+                                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                                <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding MeleeWeaponClass}"/>
+                                                                                <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Distance}"/>
+                                                                                <GridViewColumn Header="РоФ" DisplayMemberBinding="{Binding RateOfFire}"/>
+                                                                                <GridViewColumn Header="Урон" DisplayMemberBinding="{Binding Damage}"/>
+                                                                                <GridViewColumn Header="Бро" DisplayMemberBinding="{Binding ArmorPiercing}"/>
+                                                                                <GridViewColumn Header="Об" DisplayMemberBinding="{Binding Clip}"/>
+                                                                                <GridViewColumn Header="Пер" DisplayMemberBinding="{Binding Recharge}"/>
+                                                                                <GridViewColumn Header="Особенности" DisplayMemberBinding="{Binding Features}"/>
+                                                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                                            </GridView>
+                                                                        </ListView.View>
+                                                                    </ListView>
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Grid>
+                                            </ScrollViewer>
+                                            <GridSplitter Grid.Column="4" ShowsPreview="False" Width="3" HorizontalAlignment="Center" />
+                                            <Grid Grid.Column="5">
+                                                <Grid>
+                                                    <ListView ItemsSource="{Binding Ammunitions}">
+                                                        <ListView.View>
+                                                            <GridView>
+                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                <GridViewColumn Header="Цена/Количество" DisplayMemberBinding="{Binding PriceQuantity}"/>
+                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                            </GridView>
+                                                        </ListView.View>
+                                                    </ListView>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="Свойства и улучшения оружия">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Vertical" Grid.Column="0">
+                                                <TextBlock Text="Свойства оружия"/>
+                                                <TextBox x:Name="SearchTextFieldWeaponProperties" DockPanel.Dock="Top" Margin="10" Text="{Binding SearchTextWeaponProperties,
+                                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
+                                                    UpdateSourceTrigger=PropertyChanged}"/>
+                                                <ListBox ItemsSource="{Binding Source={StaticResource weaponPropertiesView}}">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Vertical">
+                                                                <TextBlock Text="{Binding Name}"/>
+                                                                <TextBlock Text="{Binding Description}"/>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="Улучшения оружия"/>
+                                                <Grid>
+                                                    <ListView ItemsSource="{Binding WeaponImprovements}">
+                                                        <ListView.View>
+                                                            <GridView>
+                                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                            </GridView>
+                                                        </ListView.View>
+                                                    </ListView>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Grid>
+                                    </TabItem>
+                                </TabControl>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Доспехи">
+                            <Grid>
+                                
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Кибернетика">
+                            <Grid>
+
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Оборудование">
+                            <Grid>
+                                
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Деньги">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <ListView ItemsSource="{Binding IncomeAndSocialClasses}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ClassCharacter}"/>
+                                            <GridViewColumn Header="Тронов/Месяц" DisplayMemberBinding="{Binding ThronesMonth}"/>
+                                            <GridViewColumn Header="Ранговый рост" DisplayMemberBinding="{Binding RankGrowth}"/>
+                                            <GridViewColumn Header="Описание" DisplayMemberBinding="{Binding Description}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <ListView Grid.Column="1" ItemsSource="{Binding ScumbagIncomes}">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="D10" DisplayMemberBinding="{Binding ClassCharacter}"/>
+                                            <GridViewColumn Header="Результаты" DisplayMemberBinding="{Binding ThronesMonth}"/>
+                                            <GridViewColumn Header="Доход" DisplayMemberBinding="{Binding RankGrowth}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Доступность">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
             </TabItem>
-            
+            <TabItem Header="Ширма" FontFamily="pack://application:,,,/fonts/#Vinque Rg">
+                <Grid>
+                    <TabControl FontSize="22">
+                        <TabItem Header="Умения">
+                            <Grid>
+
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Таланты">
+                            <Grid>
+
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Психосилы">
+                            <Grid>
+
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Критический урон">
+                            <Grid>
+
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Игровой процесс">
+                            <Grid>
+
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Мастер">
+                            <Grid>
+
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </TabItem>
+
         </TabControl>
 
     </Grid>

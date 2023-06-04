@@ -66,7 +66,7 @@ namespace WarhammerAGM
                     }
                     else
                     {
-                        string nametrim = EditableBC.Name.Trim();
+                        string? nametrim = EditableBC.Name.Trim();
                         if (nametrim == string.Empty || EditableBC.Name == "")
                         {
                             EditableBC.Name = "";
@@ -120,9 +120,9 @@ namespace WarhammerAGM
                 SelectedBC = null;
                 MessageBox.Show("Сохранение прошло успешно");
                 Mode = ViewMode.View;
+
             }
         );
     }
-
     public enum ViewMode { View, Update, Add }
 }

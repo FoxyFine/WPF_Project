@@ -6,17 +6,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using WarhammerAGM.Models;
+using WarhammerAGM.Models.Arsenal.Weapons;
 using Xceed.Wpf.Toolkit;
 
 namespace WarhammerAGM
 {
     public partial class MainWindow : Window
     {
-        private ApplicationViewModel viewModel;
+        private readonly ApplicationViewModel viewModel;
         private readonly CollectionViewSource bestiaryCreatureViewInitiative;
         private readonly CollectionViewSource bestiaryCreatureView;
         private readonly CollectionViewSource bestiaryCreatureEdit;
         private readonly CollectionViewSource characterView;
+
+        private readonly CollectionViewSource weaponPropertiesView;
         public MainWindow()
         {
             InitializeComponent();
@@ -25,8 +28,11 @@ namespace WarhammerAGM
             bestiaryCreatureEdit = (CollectionViewSource)Resources[nameof(bestiaryCreatureEdit)];
             characterView = (CollectionViewSource)Resources[nameof(characterView)];
 
-            viewModel = new ApplicationViewModel();
-            DataContext = viewModel;
+            weaponPropertiesView = (CollectionViewSource)Resources[nameof(weaponPropertiesView)];
+
+
+            viewModel = (ApplicationViewModel)DataContext;
+            DataContextChanged += (_, _) => throw new NotImplementedException("Изменение DataContext не поддерживается");
         }
 
         private string inputText = string.Empty;
@@ -66,7 +72,15 @@ namespace WarhammerAGM
                 SearchChangedC();
             }
         }
-
+        public string SearchTextWeaponProperties
+        {
+            get => inputText;
+            set
+            {
+                inputText = value?.Trim() ?? string.Empty;
+                SearchChangedWeaponProperties();
+            }
+        }
         private FilterEventHandler? filter;
         private void SearchChangedBCViewInitiative()
         {
@@ -143,6 +157,24 @@ namespace WarhammerAGM
             };
 
             characterView.Filter += filter;
+        }
+        private void SearchChangedWeaponProperties()
+        {
+            string searchText = inputText;
+            weaponPropertiesView.Filter -= filter;
+
+            filter = (string.IsNullOrEmpty(searchText)) switch
+            {
+                (false) => (object sender, FilterEventArgs e) =>
+                {
+                    WeaponPropertie weaponPropertie = (WeaponPropertie)e.Item;
+                    e.Accepted = weaponPropertie.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                }
+                ,
+                (true) => null
+            };
+
+            weaponPropertiesView.Filter += filter;
         }
 
         private void TextColorChange(object sender, RoutedEventArgs e)
