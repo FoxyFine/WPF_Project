@@ -15,8 +15,14 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using ViewModels;
 using WarhammerAGM.Models;
+using WarhammerAGM.Models.Arsenal;
+using WarhammerAGM.Models.Arsenal.Availability;
+using WarhammerAGM.Models.Arsenal.Cybernetics;
+using WarhammerAGM.Models.Arsenal.Equipment;
 using WarhammerAGM.Models.Arsenal.Money;
 using WarhammerAGM.Models.Arsenal.Weapons;
+using WarhammerAGM.Models.CriticalDamage;
+using WarhammerAGM.Models.Screen;
 using WarhammerAGM.Models.WarhammerAGM.Models;
 
 namespace WarhammerAGM
@@ -44,7 +50,26 @@ namespace WarhammerAGM
             db.WeaponProperties.Load();
             db.WeaponImprovements.Load();
             db.Ammunitions.Load();
+
+            db.Armors.Load();
+
+            db.Uniforms.Load();
+            db.SubstancesSupplies.Load();
+
+            db.AccessibilityEffects.Load();
+            db.AccessibilityPopulations.Load();
+            db.AvailabilityTimes.Load();
+            db.QualityAvailabilitys.Load();
+
+            db.Cybernetics.Load();
+
+            db.Talents.Load();
+            db.Skills.Load();
+
+            db.CriticalDamages.Load();
+
             db.Worlds.Load();
+            db.TypeDamages.Load();
 
             EditableBC = new();
             EditableBCViewInitiative = new();
@@ -73,10 +98,32 @@ namespace WarhammerAGM
             WeaponProperties = db.WeaponProperties.Local.ToObservableCollection();
             WeaponImprovements = db.WeaponImprovements.Local.ToObservableCollection();
             Ammunitions = db.Ammunitions.Local.ToObservableCollection();
+
+            Armors = db.Armors.Local.ToObservableCollection();
+
+            Uniforms = db.Uniforms.Local.ToObservableCollection();
+            SubstancesSupplies = db.SubstancesSupplies.Local.ToObservableCollection();
+
+            AccessibilityEffects = db.AccessibilityEffects.Local.ToObservableCollection();
+            AccessibilityPopulations = db.AccessibilityPopulations.Local.ToObservableCollection();
+            AvailabilityTimes = db.AvailabilityTimes.Local.ToObservableCollection();
+            QualityAvailabilitys = db.QualityAvailabilitys.Local.ToObservableCollection();
+
+            Cybernetics = db.Cybernetics.Local.ToObservableCollection();
+
+            Talents = db.Talents.Local.ToObservableCollection();
+            Skills = db.Skills.Local.ToObservableCollection();
+
+            CriticalDamages = db.CriticalDamages.Local.ToObservableCollection();
+
             Worlds = db.Worlds.Local.ToBindingList();
+            TypeDamages = db.TypeDamages.Local.ToBindingList();
 
             SelectedWorldWeaponsMelee = Worlds.FirstOrDefault();
             SelectedWorldWeaponsRanged = Worlds.FirstOrDefault();
+            SelectedWorldUniform = Worlds.FirstOrDefault();
+            SelectedWorldSubstancesSupplies = Worlds.FirstOrDefault();
+            SelectedWorldArmor = Worlds.FirstOrDefault();
 
             FileNames = new ObservableCollection<string>();
 
@@ -103,7 +150,26 @@ namespace WarhammerAGM
         public ObservableCollection<WeaponPropertie> WeaponProperties { get; set; }
         public ObservableCollection<WeaponImprovement> WeaponImprovements { get; set; }
         public ObservableCollection<Ammunition> Ammunitions { get; set; }
+
+        public ObservableCollection<Armor> Armors { get; set; }
+
+        public ObservableCollection<Uniform> Uniforms { get; set; }
+        public ObservableCollection<SubstancesSupplie> SubstancesSupplies { get; set; }
+
+        public ObservableCollection<AccessibilityEffect> AccessibilityEffects { get; set; }
+        public ObservableCollection<AccessibilityPopulation> AccessibilityPopulations { get; set; }
+        public ObservableCollection<AvailabilityTime> AvailabilityTimes { get; set; }
+        public ObservableCollection<QualityAvailability> QualityAvailabilitys { get; set; }
+
+        public ObservableCollection<Cybernetic> Cybernetics { get; set; }
+
+        public ObservableCollection<Skill> Skills { get; set; }
+        public ObservableCollection<Talent> Talents { get; set; }
+
+        public ObservableCollection<CriticalDamage> CriticalDamages { get; set; }
+
         public BindingList<World> Worlds { get; set; }
+        public BindingList<TypeDamage> TypeDamages { get; set; }
 
         //private List<Initiative> OldListInitiative;
         //private List<TemporaryInitiative> OldListTemporary;
@@ -147,6 +213,11 @@ namespace WarhammerAGM
         {
             get => Get<BestiaryCreature>()!;
             private set => Set(value ?? throw new ArgumentNullException(nameof(value)));
+        }
+        public string EditableCybernetic
+        {
+            get => Get<string>()!;
+            set => Set(value);
         }
         /// <summary>Выбранная сущность.</summary>
         public BestiaryCreature? SelectedBC
@@ -278,6 +349,10 @@ namespace WarhammerAGM
                     EditableDeath = new();
                 else
                     EditableDeath = db.DeathListInitiatives.AsNoTracking().First(bc => bc.Id == @new.Id);
+            }
+            if (propertyName == nameof(SelectedCybernetic))
+            {
+                EditableCybernetic = SelectedCybernetic.Description;
             }
         }
         /// <summary>Удаление сущности <see cref="SelectedBC"/>.</summary>
@@ -872,6 +947,18 @@ namespace WarhammerAGM
         public ObservableCollection<RangedWeapon> RangedWeaponsViewGrenades { get; set; } = new ObservableCollection<RangedWeapon>();
         public ObservableCollection<RangedWeapon> RangedWeaponsViewExotic { get; set; } = new ObservableCollection<RangedWeapon>();
 
+        public ObservableCollection<Armor> ArmorViewPrimitive { get; set; } = new ObservableCollection<Armor>();
+        public ObservableCollection<Armor> ArmorViewFlag { get; set; } = new ObservableCollection<Armor>();
+        public ObservableCollection<Armor> ArmorViewSintskin { get; set; } = new ObservableCollection<Armor>();
+        public ObservableCollection<Armor> ArmorViewCellular { get; set; } = new ObservableCollection<Armor>();
+        public ObservableCollection<Armor> ArmorViewKarapax { get; set; } = new ObservableCollection<Armor>();
+        public ObservableCollection<Armor> ArmorViewPower { get; set; } = new ObservableCollection<Armor>();
+        public ObservableCollection<Armor> ArmorViewAdvanced { get; set; } = new ObservableCollection<Armor>();
+
+        public ObservableCollection<Uniform> UniformView { get; set; } = new ObservableCollection<Uniform>();
+        public ObservableCollection<SubstancesSupplie> SubstancesSupplieView { get; set; } = new ObservableCollection<SubstancesSupplie>();
+
+
 
         public bool VisibilityPrimitiveMelee
         {
@@ -893,6 +980,7 @@ namespace WarhammerAGM
             get => Get<bool>()!;
             set => Set(value);
         }
+
 
         private World selectedworldWeaponsMelee;
         public World SelectedWorldWeaponsMelee
@@ -963,7 +1051,7 @@ namespace WarhammerAGM
 
             if (MeleeWeaponsViewShock.Count != 0)
                 VisibilityShockMelee = true;
-            else 
+            else
             { VisibilityShockMelee = false; }
         }
         private World selectedworldWeaponsRanged;
@@ -1175,6 +1263,269 @@ namespace WarhammerAGM
                 else
                 { VisibilityExoticRanged = false; }
             }
+        }
+        public bool VisibilityPrimitiveArmor
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityFlagArmor
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilitySintskinArmor
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityCellularArmor
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityKarapaxArmor
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityPowerArmor
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilityAdvancedArmor
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        private World selectedworldArmor;
+        public World SelectedWorldArmor
+        {
+            get { return selectedworldArmor; }
+            set
+            {
+                selectedworldArmor = value;
+                ArmorViewWorld();
+            }
+        }
+        public void ArmorViewWorld()
+        {
+            if (Armors.Count == 0)
+                return;
+            var weapons = db.Armors.Where(w => w.World == SelectedWorldArmor.Name).ToList();
+
+            ArmorViewPrimitive.Clear();
+            ArmorViewFlag.Clear();
+            ArmorViewSintskin.Clear();
+            ArmorViewCellular.Clear();
+            ArmorViewKarapax.Clear();
+            ArmorViewPower.Clear();
+            ArmorViewAdvanced.Clear();
+            db.SaveChanges();
+
+            // Добавляем элементы в существующую коллекцию
+            foreach (var weapon in weapons)
+            {
+                if (weapon.Type == "Primitive")
+                {
+                    ArmorViewPrimitive.Add(weapon);
+                }
+                else
+                {
+                    if (weapon.Type == "Flag")
+                    {
+                        ArmorViewFlag.Add(weapon);
+                    }
+                    else
+                    {
+                        if (weapon.Type == "Sintskin")
+                        {
+                            ArmorViewSintskin.Add(weapon);
+                        }
+                        else
+                        {
+                            if (weapon.Type == "Cellular")
+                            {
+                                ArmorViewCellular.Add(weapon);
+                            }
+                            else
+                            {
+                                if (weapon.Type == "Karapax")
+                                {
+                                    ArmorViewKarapax.Add(weapon);
+                                }
+                                else
+                                {
+                                    if (weapon.Type == "Power")
+                                    {
+                                        ArmorViewPower.Add(weapon);
+                                    }
+                                    else
+                                    {
+                                        if (weapon.Type == "Advanced")
+                                        {
+                                            ArmorViewAdvanced.Add(weapon);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            db.SaveChanges();
+            if (ArmorViewPrimitive.Count != 0)
+                VisibilityPrimitiveArmor = true;
+            else
+            { VisibilityPrimitiveArmor = false; }
+
+            if (ArmorViewFlag.Count != 0)
+            { VisibilityFlagArmor = true; }
+            else
+            { VisibilityFlagArmor = false; }
+
+            if (ArmorViewSintskin.Count != 0)
+                VisibilitySintskinArmor = true;
+            else
+            { VisibilitySintskinArmor = false; }
+
+            if (ArmorViewCellular.Count != 0)
+                VisibilityCellularArmor = true;
+            else
+            { VisibilityCellularArmor = false; }
+
+            if (ArmorViewKarapax.Count != 0)
+                VisibilityKarapaxArmor = true;
+            else
+            { VisibilityKarapaxArmor = false; }
+
+            if (ArmorViewPower.Count != 0)
+                VisibilityPowerArmor = true;
+            else
+            { VisibilityPowerArmor = false; }
+
+            if (ArmorViewAdvanced.Count != 0)
+                VisibilityAdvancedArmor = true;
+            else
+            { VisibilityAdvancedArmor = false; }
+        }
+        private World selectedworldUniform;
+        public World SelectedWorldUniform
+        {
+            get { return selectedworldUniform; }
+            set
+            {
+                selectedworldUniform = value;
+                UniformViewWorld();
+            }
+        }
+        private World selectedworldSubstancesSupplies;
+        public World SelectedWorldSubstancesSupplies
+        {
+            get { return selectedworldSubstancesSupplies; }
+            set
+            {
+                selectedworldSubstancesSupplies = value;
+                SubstancesSuppliesViewWorld();
+            }
+        }
+        public bool VisibilityUniform
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public bool VisibilitySubstancesSupplies
+        {
+            get => Get<bool>()!;
+            set => Set(value);
+        }
+        public void UniformViewWorld()
+        {
+            if (Uniforms.Count == 0)
+                return;
+            var weapons = db.Uniforms.Where(w => w.World == SelectedWorldUniform.Name).ToList();
+
+            UniformView.Clear();
+            db.SaveChanges();
+            foreach (var weapon in weapons)
+            {
+                UniformView.Add(weapon);
+            }
+            db.SaveChanges();
+            if (UniformView.Count != 0)
+                VisibilityUniform = true;
+            else
+            { VisibilityUniform = false; }
+
+        }
+        public void SubstancesSuppliesViewWorld()
+        {
+            if (SubstancesSupplies.Count == 0)
+                return;
+            var weapons = db.SubstancesSupplies.Where(w => w.World == SelectedWorldSubstancesSupplies.Name).ToList();
+
+            SubstancesSupplieView.Clear();
+            db.SaveChanges();
+            foreach (var weapon in weapons)
+            {
+                SubstancesSupplieView.Add(weapon);
+            }
+            db.SaveChanges();
+            if (SubstancesSupplieView.Count != 0)
+                VisibilitySubstancesSupplies = true;
+            else
+            { VisibilitySubstancesSupplies = false; }
+
+        }
+        public Cybernetic? SelectedCybernetic
+        {
+            get => Get<Cybernetic?>();
+            set => Set(value);
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        public ObservableCollection<CriticalDamage> ViewHead { get; set; } = new ObservableCollection<CriticalDamage>();
+        public ObservableCollection<CriticalDamage> ViewArm { get; set; } = new ObservableCollection<CriticalDamage>();
+        public ObservableCollection<CriticalDamage> ViewTorso { get; set; } = new ObservableCollection<CriticalDamage>();
+        public ObservableCollection<CriticalDamage> ViewLeg { get; set; } = new ObservableCollection<CriticalDamage>();
+
+        private TypeDamage selectedTypeDamage;
+        public TypeDamage SelectedTypeDamage
+        {
+            get { return selectedTypeDamage; }
+            set
+            {
+                selectedTypeDamage = value;
+                CriticalDamageView();
+            }
+        }
+        public void CriticalDamageView()
+        {
+
+            if (CriticalDamages.Count == 0)
+                return;
+            var damages = db.CriticalDamages.Where(w => w.TypeDamage == SelectedTypeDamage.Name).ToList();
+
+            ViewHead.Clear();
+            ViewArm.Clear();
+            ViewTorso.Clear();
+            ViewLeg.Clear();
+            db.SaveChanges();
+            foreach (var damage in damages)
+            {
+                if (damage.BodyPart == "Head")
+                    ViewHead.Add(damage);
+                else
+                if (damage.BodyPart == "Arm")
+                    ViewArm.Add(damage);
+                else
+                    if(damage.BodyPart == "Torso")
+                    ViewTorso.Add(damage);
+                else
+                    if(damage.BodyPart == "Leg")
+                    ViewLeg.Add(damage);
+            }
+            db.SaveChanges();
         }
     }
 }

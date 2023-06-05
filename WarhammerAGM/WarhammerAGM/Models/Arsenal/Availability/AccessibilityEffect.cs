@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WarhammerAGM.Models.Arsenal.Availability
 {
-    public partial class AccessibilityEffects
+    public partial class AccessibilityEffect
     {
         [Key]
         public int Id { get; set; }

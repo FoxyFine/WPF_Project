@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using WarhammerAGM.Models;
 using WarhammerAGM.Models.Arsenal.Weapons;
+using WarhammerAGM.Models.Screen;
 using Xceed.Wpf.Toolkit;
 
 namespace WarhammerAGM
@@ -20,6 +21,9 @@ namespace WarhammerAGM
         private readonly CollectionViewSource characterView;
 
         private readonly CollectionViewSource weaponPropertiesView;
+
+        private readonly CollectionViewSource skillsView;
+        private readonly CollectionViewSource talentsView;
         public MainWindow()
         {
             InitializeComponent();
@@ -30,6 +34,8 @@ namespace WarhammerAGM
 
             weaponPropertiesView = (CollectionViewSource)Resources[nameof(weaponPropertiesView)];
 
+            skillsView = (CollectionViewSource)Resources[nameof(skillsView)];
+            talentsView = (CollectionViewSource)Resources[nameof(talentsView)];
 
             viewModel = (ApplicationViewModel)DataContext;
             DataContextChanged += (_, _) => throw new NotImplementedException("Изменение DataContext не поддерживается");
@@ -79,6 +85,24 @@ namespace WarhammerAGM
             {
                 inputText = value?.Trim() ?? string.Empty;
                 SearchChangedWeaponProperties();
+            }
+        }
+        public string SearchTextSkills
+        {
+            get => inputText;
+            set
+            {
+                inputText = value?.Trim() ?? string.Empty;
+                SearchChangedSkills();
+            }
+        }
+        public string SearchTextTalents
+        {
+            get => inputText;
+            set
+            {
+                inputText = value?.Trim() ?? string.Empty;
+                SearchChangedTalents();
             }
         }
         private FilterEventHandler? filter;
@@ -176,7 +200,42 @@ namespace WarhammerAGM
 
             weaponPropertiesView.Filter += filter;
         }
+        private void SearchChangedSkills()
+        {
+            string searchText = inputText;
+            skillsView.Filter -= filter;
 
+            filter = (string.IsNullOrEmpty(searchText)) switch
+            {
+                (false) => (object sender, FilterEventArgs e) =>
+                {
+                    Skill skills = (Skill)e.Item;
+                    e.Accepted = skills.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                }
+                ,
+                (true) => null
+            };
+
+            skillsView.Filter += filter;
+        }
+        private void SearchChangedTalents()
+        {
+            string searchText = inputText;
+            talentsView.Filter -= filter;
+
+            filter = (string.IsNullOrEmpty(searchText)) switch
+            {
+                (false) => (object sender, FilterEventArgs e) =>
+                {
+                    Talent skills = (Talent)e.Item;
+                    e.Accepted = skills.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                }
+                ,
+                (true) => null
+            };
+
+            talentsView.Filter += filter;
+        }
         private void TextColorChange(object sender, RoutedEventArgs e)
         {
 

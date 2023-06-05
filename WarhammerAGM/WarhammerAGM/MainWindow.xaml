@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:WarhammerAGM" xmlns:models="clr-namespace:WarhammerAGM.Models" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
-        Title="MainWindow" Height="710" Width="1130"
+        Title="MainWindow" Height="710" Width="1230"
         FontSize="16"
         DataContext="{DynamicResource vm}"
         Name="AGM">
@@ -24,6 +24,8 @@
         <CollectionViewSource x:Key="bestiaryCreatureEdit" Source="{Binding BestiaryCreatures}"/>
         <CollectionViewSource x:Key="characterView" Source="{Binding Characters}"/>
         <CollectionViewSource x:Key="weaponPropertiesView" Source="{Binding WeaponProperties}"/>
+        <CollectionViewSource x:Key="skillsView" Source="{Binding Skills}"/>
+        <CollectionViewSource x:Key="talentsView" Source="{Binding Talents}"/>
         <Style x:Key="RepeatButtonTransparent" TargetType="{x:Type RepeatButton}">
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -331,7 +333,8 @@
                             UpdateSourceTrigger=PropertyChanged}"/>
                         <ListBox ItemsSource="{Binding Source={StaticResource bestiaryCreatureView}}"
                                          SelectedItem="{Binding SelectedBCView}"
-                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}"> <!--ПРОСМОТРЕТЬ-->
+                                         IsEnabled="{Binding Mode, Converter={local:ViewMode}}">
+                            <!--ПРОСМОТРЕТЬ-->
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name, Mode=OneTime}"  />
@@ -1728,17 +1731,199 @@
                         </TabItem>
                         <TabItem Header="Доспехи">
                             <Grid>
-                                
-                            </Grid>
-                        </TabItem>
-                        <TabItem Header="Кибернетика">
-                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <ComboBox Grid.Row="0" ItemsSource="{Binding Worlds, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedWorldArmor}" DisplayMemberPath="Name" Grid.ColumnSpan="3"/>
+                                <ScrollViewer Grid.Row="1" Grid.ColumnSpan="3">
+                                    <Grid>
+                                        <StackPanel>
+                                            
+                                            <StackPanel>
+                                                <TextBlock Text="Примитивные доспехи" Visibility="{Binding VisibilityPrimitiveArmor, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                <ListView ItemsSource="{Binding ArmorViewPrimitive}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityPrimitiveArmor, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                    <ListView.View>
+                                                        <GridView>
+                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ProtectionZones}"/>
+                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Protection}"/>
+                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                        </GridView>
+                                                    </ListView.View>
+                                                </ListView>
+                                            </StackPanel>
+                                            
+                                            <StackPanel>
+                                                <TextBlock Text="Флак-доспехи" Visibility="{Binding VisibilityFlagArmor, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                <ListView ItemsSource="{Binding ArmorViewFlag}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityFlagArmor, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                    <ListView.View>
+                                                        <GridView>
+                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ProtectionZones}"/>
+                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Protection}"/>
+                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                        </GridView>
+                                                    </ListView.View>
+                                                </ListView>
+                                            </StackPanel>
+                                            
+                                            <StackPanel>
+                                                <TextBlock Text="Синтскин" Visibility="{Binding VisibilitySintskinArmor, Converter={StaticResource VisibilityConverterTrueFalse}}" />
+                                                <ListView ItemsSource="{Binding ArmorViewSintskin}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilitySintskinArmor, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                    <ListView.View>
+                                                        <GridView>
+                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ProtectionZones}"/>
+                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Protection}"/>
+                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                        </GridView>
+                                                    </ListView.View>
+                                                </ListView>
+                                            </StackPanel>
+                                            
+                                            <StackPanel>
+                                                <TextBlock Text="Ячеистые доспехи" Visibility="{Binding VisibilityCellularArmor, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                <ListView ItemsSource="{Binding ArmorViewCellular}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityCellularArmor, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                    <ListView.View>
+                                                        <GridView>
+                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ProtectionZones}"/>
+                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Protection}"/>
+                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                        </GridView>
+                                                    </ListView.View>
+                                                </ListView>
+                                            </StackPanel>
+                                            
+                                            <StackPanel>
+                                                <TextBlock Text="Карпакс" Visibility="{Binding VisibilityKarapaxArmor, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                <ListView ItemsSource="{Binding ArmorViewKarapax}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityKarapaxArmor, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                    <ListView.View>
+                                                        <GridView>
+                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ProtectionZones}"/>
+                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Protection}"/>
+                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                        </GridView>
+                                                    </ListView.View>
+                                                </ListView>
+                                            </StackPanel>
 
+                                            <StackPanel>
+                                                <TextBlock Text="Силовые доспехи" Visibility="{Binding VisibilityPowerArmor, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                <ListView ItemsSource="{Binding ArmorViewPower}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityPowerArmor, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                    <ListView.View>
+                                                        <GridView>
+                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ProtectionZones}"/>
+                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Protection}"/>
+                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                        </GridView>
+                                                    </ListView.View>
+                                                </ListView>
+                                            </StackPanel>
+
+                                            <StackPanel>
+                                                <TextBlock Text="Продвинутая броня" Visibility="{Binding VisibilityAdvancedArmor, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                                <ListView ItemsSource="{Binding ArmorViewAdvanced}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityAdvancedArmor, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                                    <ListView.View>
+                                                        <GridView>
+                                                            <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ProtectionZones}"/>
+                                                            <GridViewColumn Header="Дистанция" DisplayMemberBinding="{Binding Protection}"/>
+                                                            <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                            <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                            <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                        </GridView>
+                                                    </ListView.View>
+                                                </ListView>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </ScrollViewer>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Оборудование">
                             <Grid>
-                                
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <ComboBox ItemsSource="{Binding Worlds, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedWorldUniform}" DisplayMemberPath="Name" Grid.ColumnSpan="3"/>
+                                    <TextBlock Text="Обмундирование" Visibility="{Binding VisibilityUniform, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                    <ListView ItemsSource="{Binding UniformView}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilityUniform, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Name}"/>
+                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <ComboBox ItemsSource="{Binding Worlds, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedWorldSubstancesSupplies}" DisplayMemberPath="Name" Grid.ColumnSpan="3"/>
+                                    <TextBlock Text="Вещества и припасы" Visibility="{Binding VisibilitySubstancesSupplies, Converter={StaticResource VisibilityConverterTrueFalse}}"/>
+                                    <ListView ItemsSource="{Binding SubstancesSupplieView}" ScrollViewer.VerticalScrollBarVisibility="Disabled" Visibility="{Binding VisibilitySubstancesSupplies, Converter={StaticResource VisibilityConverterTrueFalse}}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="Имя" DisplayMemberBinding="{Binding Name}"/>
+                                                <GridViewColumn Header="Вес" DisplayMemberBinding="{Binding Weight}"/>
+                                                <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Кибернетика">
+                            <Grid>
+                                <TabControl>
+                                    <TabItem Header="Кибернетика">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ListView ItemsSource="{Binding Cybernetics}" Grid.Column="0" SelectedItem="{Binding SelectedCybernetic}">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn Header="Наименование" DisplayMemberBinding="{Binding Name}"/>
+                                                        <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price}"/>
+                                                        <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                            <TextBlock Grid.Column="1" Text="{Binding EditableCybernetic}"/>
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="Имплатны и Благословение Омниссии">
+                                        <Grid>
+                                            <TextBlock Text="В разработке..."/>
+                                        </Grid>
+                                    </TabItem>
+                                </TabControl>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Деньги">
@@ -1747,34 +1932,98 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <ListView ItemsSource="{Binding IncomeAndSocialClasses}">
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ClassCharacter}"/>
-                                            <GridViewColumn Header="Тронов/Месяц" DisplayMemberBinding="{Binding ThronesMonth}"/>
-                                            <GridViewColumn Header="Ранговый рост" DisplayMemberBinding="{Binding RankGrowth}"/>
-                                            <GridViewColumn Header="Описание" DisplayMemberBinding="{Binding Description}"/>
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
-                                <ListView Grid.Column="1" ItemsSource="{Binding ScumbagIncomes}">
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Header="D10" DisplayMemberBinding="{Binding ClassCharacter}"/>
-                                            <GridViewColumn Header="Результаты" DisplayMemberBinding="{Binding ThronesMonth}"/>
-                                            <GridViewColumn Header="Доход" DisplayMemberBinding="{Binding RankGrowth}"/>
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
+                                <StackPanel>
+                                    <TextBlock Text="Доходы и Социальные Классы"/>
+                                    <ListView ItemsSource="{Binding IncomeAndSocialClasses}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="Класс" DisplayMemberBinding="{Binding ClassCharacter}"/>
+                                                <GridViewColumn Header="Тронов/Месяц" DisplayMemberBinding="{Binding ThronesMonth}"/>
+                                                <GridViewColumn Header="Ранговый рост" DisplayMemberBinding="{Binding RankGrowth}"/>
+                                                <GridViewColumn Header="Описание" DisplayMemberBinding="{Binding Description}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Доход подонка"/>
+                                    <ListView ItemsSource="{Binding ScumbagIncomes}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="D10" DisplayMemberBinding="{Binding ClassCharacter}"/>
+                                                <GridViewColumn Header="Результаты" DisplayMemberBinding="{Binding ThronesMonth}"/>
+                                                <GridViewColumn Header="Доход" DisplayMemberBinding="{Binding RankGrowth}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Доступность">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Column="1" Grid.Row="0">
+                                    <TextBlock Text="Эффекты Доступности"/>
+                                    <ListView ItemsSource="{Binding AccessibilityEffects}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                <GridViewColumn Header="Сложность" DisplayMemberBinding="{Binding Complexity}"/>
+                                                <GridViewColumn Header="Модификатор" DisplayMemberBinding="{Binding Modifier}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
+                                <StackPanel Grid.Column="0" Grid.Row="0">
+                                    <TextBlock Text="Доступность по Населению"/>
+                                    <ListView ItemsSource="{Binding ScumbagIncomes}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                                <GridViewColumn Header="Менее 1.000" DisplayMemberBinding="{Binding Less1000}"/>
+                                                <GridViewColumn Header="Менее 10.000" DisplayMemberBinding="{Binding Less10000}"/>
+                                                <GridViewColumn Header="Менее 100.000" DisplayMemberBinding="{Binding Less100000}"/>
+                                                <GridViewColumn Header="100.000 и более" DisplayMemberBinding="{Binding More100000}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
+                                <StackPanel Grid.Column="0" Grid.Row="1">
+                                    <TextBlock Text="Доступность и Время"/>
+                                    <ListView ItemsSource="{Binding ScumbagIncomes}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="Население" DisplayMemberBinding="{Binding Population}"/>
+                                                <GridViewColumn Header="Раритет" DisplayMemberBinding="{Binding Rarity}"/>
+                                                <GridViewColumn Header="Редкая" DisplayMemberBinding="{Binding Rare}"/>
+                                                <GridViewColumn Header="Скудная" DisplayMemberBinding="{Binding Meager}"/>
+                                                <GridViewColumn Header="Средняя" DisplayMemberBinding="{Binding Average}"/>
+                                                <GridViewColumn Header="Распростр." DisplayMemberBinding="{Binding Common}"/>
+                                                <GridViewColumn Header="Обильная" DisplayMemberBinding="{Binding Plentiful}"/>
+                                                <GridViewColumn Header="Изобильная" DisplayMemberBinding="{Binding Abundant}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Grid.Row="1">
+                                    <TextBlock Text="Цена качество"/>
+                                    <ListView ItemsSource="{Binding ScumbagIncomes}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="Качество" DisplayMemberBinding="{Binding Quality}"/>
+                                                <GridViewColumn Header="Множитель цены" DisplayMemberBinding="{Binding PriceMultiplier}"/>
+                                                <GridViewColumn Header="Доступность" DisplayMemberBinding="{Binding Availability}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </StackPanel>
                             </Grid>
                         </TabItem>
                     </TabControl>
@@ -1785,27 +2034,104 @@
                     <TabControl FontSize="22">
                         <TabItem Header="Умения">
                             <Grid>
-
+                                <StackPanel>
+                                    <TextBox DockPanel.Dock="Top" Margin="10" Text="{Binding SearchChangedSkills,
+                                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
+                                                    UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ListBox ItemsSource="{Binding Source={StaticResource skillsView}}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Vertical">
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                    <TextBlock Text="{Binding Description}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Таланты">
                             <Grid>
-
+                                <StackPanel>
+                                    <TextBox DockPanel.Dock="Top" Margin="10" Text="{Binding SearchTextTalents,
+                                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindow}},
+                                                    UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ListBox ItemsSource="{Binding Source={StaticResource talentsView}}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Vertical">
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                    <TextBlock Text="{Binding Description}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Психосилы">
                             <Grid>
-
+                                <TextBlock Text="В разработке..."/>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="Критический урон">
+                        <TabItem Header="Ранения">
                             <Grid>
-
+                                <TabControl>
+                                    <TabItem Header="Критический урон">
+                                        <StackPanel>
+                                            <ComboBox Grid.Row="0" ItemsSource="{Binding TypeDamages, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedTypeDamage}" DisplayMemberPath="Name"/>
+                                            <TextBlock Text="Голова"/>
+                                            <ListView ItemsSource="{Binding ViewHead}">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn Header="Критический урон" DisplayMemberBinding="{Binding CriticalDamageUnits}"/>
+                                                        <GridViewColumn Header="Эффект" DisplayMemberBinding="{Binding Effect}"/>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                            <TextBlock Text="Рука"/>
+                                            <ListView ItemsSource="{Binding ViewArm}">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn Header="Критический урон" DisplayMemberBinding="{Binding CriticalDamageUnits}"/>
+                                                        <GridViewColumn Header="Эффект" DisplayMemberBinding="{Binding Effect}"/>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                            <TextBlock Text="Торс"/>
+                                            <ListView ItemsSource="{Binding ViewTorso}">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn Header="Критический урон" DisplayMemberBinding="{Binding CriticalDamageUnits}"/>
+                                                        <GridViewColumn Header="Эффект" DisplayMemberBinding="{Binding Effect}"/>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                            <TextBlock Text="Нога"/>
+                                            <ListView ItemsSource="{Binding ViewLeg}">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn Header="Критический урон" DisplayMemberBinding="{Binding CriticalDamageUnits}"/>
+                                                        <GridViewColumn Header="Эффект" DisplayMemberBinding="{Binding Effect}"/>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                        </StackPanel>
+                                    </TabItem>
+                                </TabControl>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Игровой процесс">
                             <Grid>
+                                <TabControl>
+                                    <TabItem Header="Роль судьбы">
+                                        
+                                    </TabItem>
+                                    <TabItem Header="Бой">
 
+                                    </TabItem>
+                                </TabControl>
                             </Grid>
                         </TabItem>
                         <TabItem Header="Мастер">
